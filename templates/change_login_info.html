@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Change Login Information</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Change Login Information</h1>
+    </header>
+    <main>
+        <nav>
+            <a href="{{ url_for('change_username') }}" class="cta-button">Change Username</a>
+            <a href="{{ url_for('change_password') }}" class="cta-button">Change Password</a>
+        </nav>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 AI-Powered Banking. All rights reserved.</p>
+    </footer>
+</body>
+</html>
