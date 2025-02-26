@@ -39,6 +39,24 @@ def home():
 def features():
     return render_template('features.html')
 
+@app.route('/more')
+def more():
+    return render_template('more.html')
+
+@app.route('/update_account', methods=['GET', 'POST'])
+def update_account():
+    if 'username' not in session:
+        return redirect(url_for('login'))  # Redirect if not logged in
+    
+    if request.method == 'POST':
+        new_username = request.form.get('new_username')
+        new_password = request.form.get('new_password')
+        # Add logic to update user info in the database
+        session['username'] = new_username  # Update session with new username
+        return redirect(url_for('home'))  # Redirect back to homepage
+
+    return render_template('update_account.html')
+
 @app.route('/logout')
 def logout():
     session.pop('username', None)  # Clear session
@@ -46,5 +64,3 @@ def logout():
 
 if __name__ == '__main__':
     app.run(debug=True)
-
-
