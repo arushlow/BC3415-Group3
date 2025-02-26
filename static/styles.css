@@ -66,3 +66,10 @@ footer {
 .feature-button:hover {
     background-color: #0056b3; /* Darker color on hover */
 }
+
+nav {
+    display: flex;
+    flex-direction: column; /* Stack buttons vertically */
+    align-items: center; /* Center the buttons */
+    gap: 10px; /* Add space between buttons */
+}
