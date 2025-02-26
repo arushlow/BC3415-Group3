@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Change Username</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Change Username</h1>
+    </header>
+    <main>
+        <form action="{{ url_for('change_username') }}" method="POST">
+            <label for="new_username">New Username:</label>
+            <input type="text" id="new_username" name="new_username" required>
+            <button type="submit" class="cta-button">Update Username</button>
+        </form>
+        <a href="{{ url_for('change_login_info') }}" class="cta-button">Back</a>
+    </main>
+    <footer>
+        <p>&copy; 2025 AI-Powered Banking. All rights reserved.</p>
+    </footer>
+</body>
+</html>
