@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>More Options</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header>
+        <h1>More Options</h1>
+    </header>
+    <main>
+        <nav>
+            <a href="{{ url_for('update_account') }}" class="cta-button">Change Login Information</a>
+            <a href="{{ url_for('logout') }}" class="cta-button logout-button">Logout</a>
+        </nav>
+    </main>
+    
+    <footer>
+        <p>&copy; 2025 AI-Powered Banking. All rights reserved.</p>
+    </footer>
+</body>
+</html>
