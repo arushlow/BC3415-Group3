@@ -41,21 +41,30 @@ def features():
 
 @app.route('/more')
 def more():
-    return render_template('more.html')
+    return render_template('more.html')  # Your existing More Options page
 
-@app.route('/update_account', methods=['GET', 'POST'])
-def update_account():
-    if 'username' not in session:
-        return redirect(url_for('login'))  # Redirect if not logged in
-    
+@app.route('/change_login_info')
+def change_login_info():
+    return render_template('change_login_info.html')
+
+@app.route('/change_username', methods=['GET', 'POST'])
+def change_username():
     if request.method == 'POST':
-        new_username = request.form.get('new_username')
-        new_password = request.form.get('new_password')
-        # Add logic to update user info in the database
-        session['username'] = new_username  # Update session with new username
-        return redirect(url_for('home'))  # Redirect back to homepage
+        # Logic to change the username
+        new_username = request.form['new_username']
+        # Update the username in your database
+        return redirect(url_for('home'))  # Redirect after changing username
+    return render_template('change_username.html')  # Create a change_username.html
 
-    return render_template('update_account.html')
+@app.route('/change_password', methods=['GET', 'POST'])
+def change_password():
+    if request.method == 'POST':
+        # Logic to change the password
+        new_password = request.form['new_password']
+        # Update the password in your database
+        return redirect(url_for('home'))  # Redirect after changing password
+    return render_template('change_password.html')  # Create a change_password.html
+
 
 @app.route('/logout')
 def logout():
@@ -64,3 +73,5 @@ def logout():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+
