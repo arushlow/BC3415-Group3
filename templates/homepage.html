@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Welcome, {{ username }}!</h1>
+    </header>
+    <main>
+        <section id="introduction">
+            <h2>Visualize Your Financial Future in Real-Time</h2>
+            <p>Our AI-powered Digital Twin allows you to simulate your financial future with real-time data integration and personalized insights.</p>
+            <p>Explore our key features to see how we can help you achieve your financial goals!</p>
+        </section>
+        <nav>
+            <a href="{{ url_for('features') }}" class="cta-button">Features</a>
+            <a href="{{ url_for('logout') }}" class="cta-button">Logout</a>
+        </nav>
+    </main>
+    <footer>
+        <p>&copy; 2025 AI-Powered Banking. All rights reserved.</p>
+    </footer>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
