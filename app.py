@@ -1,77 +1,141 @@
-from flask import Flask, render_template, redirect, url_for, request, session
+import os
+from functools import wraps
 
+from dotenv import load_dotenv
+from flask import Flask, redirect, render_template, request, session, url_for
+from flask.helpers import abort
+from flask_bcrypt import Bcrypt
+
+from model import User, create_tables, database
+
+create_tables()
+load_dotenv()
 app = Flask(__name__)
-app.secret_key = 'your_secret_key'  # Set a secret key for session management
+app.secret_key = os.getenv("FLASK_SECRET_KEY")
+bcrypt = Bcrypt(app)
 
-@app.route('/')
+
+def login_required(f):
+    @wraps(f)
+    def inner(*args, **kwargs):
+        if not session.get("logged_in"):
+            return redirect(url_for("login"))
+        return f(*args, **kwargs)
+
+    return inner
+
+
+@app.route("/")
 def welcome():
-    return render_template('welcome.html')
+    return render_template("welcome.html")
 
-@app.route('/login', methods=['GET', 'POST'])
+
+@app.route("/login", methods=["GET", "POST"])
 def login():
-    if request.method == 'POST':
-        # Implement your login logic here
-        username = request.form['username']
-        password = request.form['password']
-        # Assuming login is successful, set session
-        session['username'] = username
-        return redirect(url_for('home'))
-    return render_template('login.html')
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
 
-@app.route('/signup', methods=['GET', 'POST'])
+        try:
+            user = User.get(User.username == username)
+            if not bcrypt.check_password_hash(user.password, password):
+                return abort(400, "Invalid password")
+
+            session["logged_in"] = True
+            session["username"] = username
+            return redirect(url_for("home"))
+        except User.DoesNotExist:
+            return abort(400, "User not found")
+
+    return render_template("login.html")
+
+
+@app.route("/signup", methods=["GET", "POST"])
 def signup():
-    if request.method == 'POST':
-        # Implement your signup logic here
-        username = request.form['username']
-        password = request.form['password']
-        # Assuming signup is successful, set session
-        session['username'] = username
-        return redirect(url_for('home'))
-    return render_template('signup.html')
+    if request.method == "POST":
+        username = request.form["username"].strip()
+        if not username:
+            return abort(400, "Username cannot be empty")
 
-@app.route('/homepage')
+        password = request.form["password"]
+        result = User.select().where(User.username == username).exists()
+        if result:
+            return abort(400, "User already exists")
+
+        hashed_password = bcrypt.generate_password_hash(password).decode("utf-8")
+        with database.atomic():
+            User.create(username=username, password=hashed_password)
+        return redirect(url_for("login"))
+    return render_template("signup.html")
+
+
+@app.route("/homepage")
 def home():
-    if 'username' in session:
-        return render_template('homepage.html', username=session['username'])
-    return redirect(url_for('welcome'))
+    if "username" in session:
+        return render_template("homepage.html", username=session["username"])
+    return redirect(url_for("welcome"))
 
-@app.route('/features')
+
+@app.route("/features")
+@login_required
 def features():
-    return render_template('features.html')
+    return render_template("features.html")
 
-@app.route('/more')
+
+@app.route("/more")
+@login_required
 def more():
-    return render_template('more.html')  # Your existing More Options page
+    return render_template("more.html")  # Your existing More Options page
 
-@app.route('/change_login_info')
+
+@app.route("/change_login_info")
+@login_required
 def change_login_info():
-    return render_template('change_login_info.html')
+    return render_template("change_login_info.html")
 
-@app.route('/change_username', methods=['GET', 'POST'])
+
+@app.route("/change_username", methods=["GET", "POST"])
+@login_required
 def change_username():
-    if request.method == 'POST':
-        # Logic to change the username
-        new_username = request.form['new_username']
-        # Update the username in your database
-        return redirect(url_for('home'))  # Redirect after changing username
-    return render_template('change_username.html')  # Create a change_username.html
+    if request.method == "POST":
+        new_username = request.form["new_username"].strip()
+        if not new_username:
+            return abort(400, "Username cannot be empty")
 
-@app.route('/change_password', methods=['GET', 'POST'])
+        if User.select().where(User.username == new_username).exists():
+            return abort(400, "Username already exists")
+
+        with database.atomic():
+            user = User.get(User.username == session["username"])
+            user.username = new_username
+            user.save()
+        session["username"] = new_username
+        return redirect(url_for("home"))
+    return render_template("change_username.html")
+
+
+@app.route("/change_password", methods=["GET", "POST"])
+@login_required
 def change_password():
-    if request.method == 'POST':
-        # Logic to change the password
-        new_password = request.form['new_password']
-        # Update the password in your database
-        return redirect(url_for('home'))  # Redirect after changing password
-    return render_template('change_password.html')  # Create a change_password.html
+    if request.method == "POST":
+        new_password = request.form["new_password"]
+
+        with database.atomic():
+            user = User.get(User.username == session["username"])
+            user.password = bcrypt.generate_password_hash(new_password).decode("utf-8")
+            user.save()
+        return redirect(url_for("home"))
+    return render_template("change_password.html")
 
 
-@app.route('/logout')
+@app.route("/logout")
+@login_required
 def logout():
-    session.pop('username', None)  # Clear session
-    return redirect(url_for('welcome'))
+    session.pop("logged_in", None)
+    session.pop("user", None)
+    session.pop("username", None)
+    return redirect(url_for("welcome"))
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     app.run(debug=True)
-
-
