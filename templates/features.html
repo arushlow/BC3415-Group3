@@ -9,11 +9,10 @@
 <body>
     <h1>Features</h1>
     <h2>Key Features:</h2>
-    <div class="feature-buttons">
-        <a href="#" class="feature-button">xx</a>
-        <a href="#" class="feature-button">xx</a>
-        <a href="#" class="feature-button">xx</a>
-        <a href="#" class="feature-button">xx</a>
+    <div class="cta-buttons">
+        <a href="{{ url_for('scenario_simulation') }}" class="cta-button">Scenario Simulation</a>
+        <a href="{{ url_for('ai_generated_adjustments') }}" class="cta-button">AI-Generated Adjustments</a>
+        <a href="{{ url_for('ai_chatbot') }}" class="cta-button">AI Chatbot</a>
     </div>
     <a href="{{ url_for('home') }}" class="cta-button">Back to Homepage</a>
 </body>
