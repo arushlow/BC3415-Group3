@@ -68,14 +68,6 @@ def signup():
         return redirect(url_for("login"))
     return render_template("signup.html")
 
-
-@app.route("/homepage")
-def home():
-    if "username" in session:
-        return render_template("homepage.html", username=session["username"])
-    return redirect(url_for("welcome"))
-
-
 @app.route("/features")
 @login_required
 def features():
@@ -127,7 +119,6 @@ def change_password():
         return redirect(url_for("home"))
     return render_template("change_password.html")
 
-
 @app.route("/logout")
 @login_required
 def logout():
@@ -136,6 +127,27 @@ def logout():
     session.pop("username", None)
     return redirect(url_for("welcome"))
 
+@app.route("/scenario_simulation")
+@login_required
+def scenario_simulation():
+    return render_template("scenario_simulation.html")
 
-if __name__ == "__main__":
-    app.run(debug=True)
+@app.route("/ai_generated_adjustments")
+@login_required
+def ai_generated_adjustments():
+    return render_template("ai_generated_adjustments.html")
+
+@app.route("/ai_chatbot")
+@login_required
+def ai_chatbot():
+    return render_template("ai_chatbot.html")
+
+@app.route("/homepage")
+def home():
+    if "username" in session:
+        return render_template("homepage.html", username=session["username"])
+    return redirect(url_for("welcome"))
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404  # A custom 404 error page
