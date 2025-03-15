@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chatbot</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="{{ url_for('static', filename='chatbot.js') }}" defer></script>
+</head>
+<body>
+    <header>
+        <h1>AI Chatbot: Your Financial Assistant</h1>
+    </header>
+
+    <main>
+        <section id="chatbot-window">
+            <div id="chatbox">
+                <!-- Chat messages will appear here -->
+            </div>
+
+            <div id="input-area">
+                <input type="text" id="user-input" placeholder="Ask me anything about your finances..." autofocus>
+                <button id="send-btn">Send</button>
+            </div>
+        </section>
+
+        <section id="predefined-questions">
+            <button class="quick-response-btn" onclick="sendPredefinedQuestion('How can I save more money?')">How can I save more money?</button>
+            <button class="quick-response-btn" onclick="sendPredefinedQuestion('What should I invest in?')">What should I invest in?</button>
+            <button class="quick-response-btn" onclick="sendPredefinedQuestion('Tell me my current balance')">Tell me my current balance</button>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 AI-Powered Banking. All rights reserved.</p>
+    </footer>
+</body>
+</html>

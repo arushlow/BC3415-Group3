@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Scenario Simulation</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="{{ url_for('static', filename='script.js') }}" defer></script>
+</head>
+<body>
+    <header>
+        <h1>Financial Scenario Simulation</h1>
+        <p>Simulate the impact of different financial decisions on your future and prepare for retirement, investments, and savings growth.</p>
+    </header>
+
+    <main>
+        <section id="simulation-form">
+            <h2>Enter Your Financial Details</h2>
+            <form id="scenario-form">
+                <!-- Age and Retirement Information -->
+                <div class="input-group">
+                    <label for="current-age">Current Age</label>
+                    <input type="number" id="current-age" name="current-age" placeholder="e.g., 30" required>
+                </div>
+                
+                <div class="input-group">
+                    <label for="retirement-age">Desired Retirement Age</label>
+                    <input type="number" id="retirement-age" name="retirement-age" placeholder="e.g., 65" required>
+                </div>
+
+                <!-- Income and Expenses -->
+                <div class="input-group">
+                    <label for="monthly-income">Monthly Income (SGD)</label>
+                    <input type="number" id="monthly-income" name="monthly-income" placeholder="e.g., 5000" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="monthly-expenses">Monthly Expenses (SGD)</label>
+                    <input type="number" id="monthly-expenses" name="monthly-expenses" placeholder="e.g., 3000" required>
+                </div>
+
+                <!-- Savings and Investment Preferences -->
+                <div class="input-group">
+                    <label for="monthly-savings">Monthly Savings (SGD)</label>
+                    <input type="number" id="monthly-savings" name="monthly-savings" placeholder="e.g., 1000" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="investment-strategy">Investment Strategy</label>
+                    <select id="investment-strategy" name="investment-strategy">
+                        <option value="conservative">Conservative</option>
+                        <option value="balanced">Balanced</option>
+                        <option value="aggressive">Aggressive</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="investment-increase">Increase in Investment (%)</label>
+                    <input type="number" id="investment-increase" name="investment-increase" min="0" max="100" step="1" placeholder="e.g. 10">
+                </div>
+
+                <!-- Life Event Choices (Career Switch, Major Purchases) -->
+                <div class="input-group">
+                    <label for="career-switch-impact">Impact of Career Switch (SGD/year)</label>
+                    <input type="number" id="career-switch-impact" name="career-switch-impact" placeholder="e.g. 10000">
+                </div>
+
+                <div class="input-group">
+                    <label for="purchase-amount">Purchase Amount for House (SGD)</label>
+                    <input type="number" id="purchase-amount" name="purchase-amount" placeholder="e.g. 500000">
+                </div>
+
+                <button type="submit" class="cta-button">Simulate Scenario</button>
+            </form>
+        </section>
+
+        <section id="simulation-results">
+            <h2>Simulation Results</h2>
+            <div id="result-summary">
+                <!-- Results will be shown here after simulation -->
+            </div>
+
+            <div id="result-chart">
+                <!-- Graph or chart to show the results visually -->
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 AI-Powered Banking. All rights reserved.</p>
+    </footer>
+</body>
+</html>
