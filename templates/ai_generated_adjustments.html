@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Generated Adjustments</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="{{ url_for('static', filename='script.js') }}" defer></script>
+</head>
+<body>
+    <header>
+        <h1>AI-Generated Financial Adjustments</h1>
+        <p>Get personalized recommendations to optimize your financial future.</p>
+    </header>
+
+    <main>
+        <section id="ai-adjustments-form">
+            <h2>Set Your Preferences</h2>
+            
+            <form id="preferences-form">
+                <div class="input-group">
+                    <label for="risk-tolerance">Risk Tolerance</label>
+                    <select id="risk-tolerance" name="risk-tolerance">
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="investment-goal">Investment Goal</label>
+                    <input type="text" id="investment-goal" name="investment-goal" placeholder="e.g., Save for retirement">
+                </div>
+
+                <div class="input-group">
+                    <label for="monthly-savings">Monthly Savings (SGD)</label>
+                    <input type="number" id="monthly-savings" name="monthly-savings" placeholder="e.g., 2000">
+                </div>
+
+                <button type="submit" class="cta-button">Get AI Suggestions</button>
+            </form>
+        </section>
+
+        <section id="ai-recommendations">
+            <h2>AI Recommendations</h2>
+            <div id="recommendation-summary">
+                <!-- AI suggestions will appear here -->
+            </div>
+
+            <div id="recommendation-chart">
+                <!-- A chart or graph can go here to visualize AI suggestions -->
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 AI-Powered Banking. All rights reserved.</p>
+    </footer>
+</body>
+</html>
