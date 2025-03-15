@@ -1,38 +1,275 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Chatbot</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <script src="{{ url_for('static', filename='chatbot.js') }}" defer></script>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&icon_names=add_comment" />
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.7.0/styles/github.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.7.0/lib/highlight.min.js"></script>
 </head>
+<style>
+    .material-symbols-outlined {
+        font-variation-settings:
+            'FILL' 0,
+            'wght' 400,
+            'GRAD' 0,
+            'opsz' 24
+    }
+</style>
+
 <body>
-    <header>
-        <h1>AI Chatbot: Your Financial Assistant</h1>
-    </header>
-
-    <main>
-        <section id="chatbot-window">
-            <div id="chatbox">
-                <!-- Chat messages will appear here -->
+    <div class="chat-layout">
+        <aside class="history-sidebar">
+            <div class="sidebar-header">
+                <h2>History Conversations</h2>
+                <button id="sidebar-new-chat-btn" onclick="newChat()" title="New Chat">
+                    <span class="material-symbols-outlined">add_comment</span>
+                </button>
             </div>
-
-            <div id="input-area">
-                <input type="text" id="user-input" placeholder="Ask me anything about your finances..." autofocus>
-                <button id="send-btn">Send</button>
+            <div class="chat-list">
+                {% for chat in chats %}
+                <div class="chat-item {% if chat.chat_id == request.args.get('chat_id') %}active{% endif %}"
+                    onclick="loadChat('{{ chat.chat_id }}')">
+                    <div class="chat-preview">{{ chat.chat_title }}</div>
+                    <small class="chat-time">{{ chat.created_at.strftime('%Y-%m-%d %H:%M') if chat.created_at else 'Just
+                        now' }}</small>
+                </div>
+                {% endfor %}
+                {% if not chats %}
+                <div class="empty-history">No history</div>
+                {% endif %}
             </div>
-        </section>
+        </aside>
 
-        <section id="predefined-questions">
-            <button class="quick-response-btn" onclick="sendPredefinedQuestion('How can I save more money?')">How can I save more money?</button>
-            <button class="quick-response-btn" onclick="sendPredefinedQuestion('What should I invest in?')">What should I invest in?</button>
-            <button class="quick-response-btn" onclick="sendPredefinedQuestion('Tell me my current balance')">Tell me my current balance</button>
-        </section>
-    </main>
+        <div class="main-content">
+            <header>
+                <h1 id="chat-header-title">
+                    {% if chat_title %}
+                    {{ chat_title }}
+                    {% else %}
+                    AI Chatbot: Your Financial Assistant
+                    {% endif %}
+                </h1>
+            </header>
 
-    <footer>
-        <p>&copy; 2025 AI-Powered Banking. All rights reserved.</p>
-    </footer>
+            <main>
+                <section id="chatbot-window">
+                    <div id="chatbox" class="{% if not history %}empty{% endif %}">
+                        {% if history %}
+                        {% for msg in history %}
+                        <div class="message {{ msg.role }}-message">
+                            <div class="message-content">{{ msg.content }}</div>
+                        </div>
+                        {% endfor %}
+                        {% else %}
+                        <div id="welcome-message">
+                            <h3>Welcome to your AI Financial Assistant</h3>
+                            <p>Start a new conversation or select from suggested topics below:</p>
+                            <div id="predefined-questions-inline">
+                                <button class="quick-response-btn"
+                                    onclick="sendPredefinedQuestion('How can I save more money?')">
+                                    How can I save more money?
+                                </button>
+                                <button class="quick-response-btn"
+                                    onclick="sendPredefinedQuestion('How can I invest my money wisely?')">
+                                    How can I invest my money wisely?
+                                </button>
+                                <button class="quick-response-btn"
+                                    onclick="sendPredefinedQuestion('How to identify a good investment opportunity?')">
+                                    How to identify a good investment opportunity?
+                                </button>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </section>
+            </main>
+
+            <footer>
+                <div id="input-area">
+                    <button id="new-conversation-btn" title="New Conversation" onclick="newChat()">
+                        <span class="material-symbols-outlined">
+                            add_comment
+                        </span>
+                    </button>
+                    <input type="text" id="user-input" placeholder="Ask me anything about finances..." autofocus
+                        onkeypress="handleKeyPress(event)" />
+                    <button id="send-btn" onclick="sendMessage()">Send</button>
+                </div>
+                <p>&copy; 2025 AI-Powered rights reserved.</p>
+            </footer>
+        </div>
+    </div>
+
+    <script>
+        const chatBox = document.getElementById('chatbox');
+        const input = document.getElementById('user-input');
+        const chatHeaderTitle = document.getElementById('chat-header-title');
+
+        marked.setOptions({
+            highlight: function (code, language) {
+                if (language && hljs.getLanguage(language)) {
+                    return hljs.highlight(code, { language }).value;
+                } else {
+                    return hljs.highlightAuto(code).value;
+                }
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const messageContents = document.querySelectorAll('.message-content');
+            messageContents.forEach(element => {
+                const rawText = element.textContent;
+                element.innerHTML = renderMarkdown(rawText);
+            });
+
+            html = document.querySelector("html");
+            html.scrollTop = html.scrollHeight;
+        });
+
+        function renderMarkdown(text) {
+            return marked.parse(text);
+        }
+
+        function appendMessage(role, content, id) {
+            if (chatBox.classList.contains('empty')) {
+                chatBox.innerHTML = '';
+                chatBox.classList.remove('empty');
+            }
+
+            const div = document.createElement('div');
+            div.className = `message ${role}-message`;
+
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+
+            if (role === 'user') {
+                contentDiv.textContent = content;
+            } else {
+                contentDiv.textContent = content;
+            }
+
+            div.appendChild(contentDiv);
+            if (id) div.dataset.tempId = id;
+            chatBox.appendChild(div);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function updateMessage(id, content) {
+            const target = document.querySelector(`[data-temp-id="${id}"]`);
+            if (target) {
+                const contentDiv = target.querySelector('.message-content');
+                if (target.classList.contains('assistant-message')) {
+                    contentDiv.innerHTML = renderMarkdown(content);
+                } else {
+                    contentDiv.textContent = content;
+                }
+            }
+        }
+
+        function handleKeyPress(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        }
+
+        function sendPredefinedQuestion(question) {
+            input.value = question;
+            sendMessage();
+        }
+
+        function sendMessage() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const chatId = urlParams.get('chat_id')
+            const message = input.value.trim();
+            if (!message) return;
+
+            chatHeaderTitle.textContent = message.substring(0, 32);
+            input.disabled = true;
+            document.querySelector('#send-btn').disabled = true;
+            input.value = '';
+            appendMessage('user', message);
+
+            const tempId = Date.now();
+            appendMessage('assistant', '▌', tempId);
+
+            const formData = new FormData();
+            formData.append('message', message);
+            if (chatId) formData.append('chat_id', chatId);
+
+            fetch('/send_message', {
+                method: 'POST',
+                body: formData
+            }).then(response => {
+                const reader = response.body.getReader();
+                let assistantContent = '';
+                const decoder = new TextDecoder();
+
+                function push() {
+                    return reader.read().then(({ done, value }) => {
+                        if (done) {
+                            updateMessage(tempId, assistantContent);
+
+                            if (!urlParams.has('chat_id')) {
+                                addChatToSidebar(chatId, message);
+                            }
+                            return;
+                        }
+
+                        const chunk = decoder.decode(value);
+                        assistantContent += chunk;
+
+                        updateMessage(tempId, assistantContent + '▌');
+
+                        chatBox.scrollTop = chatBox.scrollHeight;
+
+                        return push();
+                    });
+                }
+
+                return push();
+            }).catch(error => {
+                console.error('Error:', error);
+                updateMessage(tempId, '⚠️ Something went wrong. Please try again later.');
+            }).finally(() => {
+                input.disabled = false;
+                document.querySelector('#send-btn').disabled = false;
+                input.focus();
+            });
+        }
+
+        function addChatToSidebar(id, firstMessage) {
+            const sidebar = document.querySelector('.chat-list');
+            const div = document.createElement('div');
+            div.className = 'chat-item';
+            div.innerHTML = `
+                <div class="chat-preview">${firstMessage.substring(0, 32)}${firstMessage.length > 32 ? '...' : ''}</div>
+                <small class="chat-time">Just now</small>
+            `;
+            div.onclick = () => loadChat(id);
+            sidebar.insertBefore(div, sidebar.firstChild);
+        }
+
+        function loadChat(chatId) {
+            window.location.href = `/ai_chatbot?chat_id=${chatId}`;
+        }
+
+        function newChat() {
+            window.location.href = "/new_chat";
+        }
+
+        function toggleSidebar() {
+            document.querySelector('.history-sidebar').classList.toggle('active');
+        }
+    </script>
 </body>
+
 </html>

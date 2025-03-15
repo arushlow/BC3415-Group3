@@ -2,3 +2,4 @@ Flask
 dotenv
 peewee
 flask-bcrypt
+openai
