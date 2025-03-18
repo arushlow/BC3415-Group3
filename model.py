@@ -1,9 +1,10 @@
 from peewee import (
     AutoField,
+    DateTimeField,
     SqliteDatabase,
     Model,
     CharField,
-    IntegerField,
+    UUIDField,
     ForeignKeyField,
 )
 
@@ -27,9 +28,11 @@ class Investment(BaseModel):
 
 class ChatHistory(BaseModel):
     user = ForeignKeyField(User, backref="chats")
-    chat_id = IntegerField()
+    chat_id = UUIDField()
+    chat_title = CharField()
     message_id = AutoField()
     message = CharField()
+    created_at = DateTimeField()
 
     class Meta:
         indexes = (

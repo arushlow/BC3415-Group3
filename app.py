@@ -1,15 +1,22 @@
+from datetime import datetime
+import json
 import os
+import uuid
 from functools import wraps
 
 from dotenv import load_dotenv
-from flask import Flask, redirect, render_template, request, session, url_for
-from flask.helpers import abort
+from flask import Flask, Response, redirect, render_template, request, session, url_for
 from flask_bcrypt import Bcrypt
+from openai import OpenAI
+from peewee import IntegrityError
 
-from model import User, create_tables, database
+from model import ChatHistory, User, create_tables, database
 
 create_tables()
 load_dotenv()
+client = OpenAI(
+    base_url="https://openrouter.ai/api/v1", api_key=os.getenv("OPENROUTER_API_KEY")
+)
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY")
 bcrypt = Bcrypt(app)
@@ -39,13 +46,13 @@ def login():
         try:
             user = User.get(User.username == username)
             if not bcrypt.check_password_hash(user.password, password):
-                return abort(400, "Invalid password")
+                return render_template("login.html", error="Invalid password")
 
             session["logged_in"] = True
             session["username"] = username
             return redirect(url_for("home"))
         except User.DoesNotExist:
-            return abort(400, "User not found")
+            return render_template("login.html", error="User not found")
 
     return render_template("login.html")
 
@@ -55,18 +62,19 @@ def signup():
     if request.method == "POST":
         username = request.form["username"].strip()
         if not username:
-            return abort(400, "Username cannot be empty")
+            return render_template("signup.html", error="Username cannot be empty")
 
         password = request.form["password"]
         result = User.select().where(User.username == username).exists()
         if result:
-            return abort(400, "User already exists")
+            return render_template("signup.html", error="User already exists")
 
         hashed_password = bcrypt.generate_password_hash(password).decode("utf-8")
         with database.atomic():
             User.create(username=username, password=hashed_password)
         return redirect(url_for("login"))
     return render_template("signup.html")
+
 
 @app.route("/features")
 @login_required
@@ -92,15 +100,29 @@ def change_username():
     if request.method == "POST":
         new_username = request.form["new_username"].strip()
         if not new_username:
-            return abort(400, "Username cannot be empty")
+            return render_template(
+                "change_username.html", error="Username cannot be empty"
+            )
 
         if User.select().where(User.username == new_username).exists():
-            return abort(400, "Username already exists")
+            return render_template(
+                "change_username.html", error="Username already exists"
+            )
+        try:
+            with database.atomic():
+                user = User.get(User.username == session["username"])
+                user.username = new_username
+                user.save()
+        except IntegrityError:
+            return render_template(
+                "change_username.html", error="Username already exists"
+            )
+        except Exception as e:
+            print(e)
+            return render_template(
+                "change_username.html", error="An error occurred, please try again"
+            )
 
-        with database.atomic():
-            user = User.get(User.username == session["username"])
-            user.username = new_username
-            user.save()
         session["username"] = new_username
         return redirect(url_for("home"))
     return render_template("change_username.html")
@@ -127,20 +149,122 @@ def logout():
     session.pop("username", None)
     return redirect(url_for("welcome"))
 
+
 @app.route("/scenario_simulation")
 @login_required
 def scenario_simulation():
     return render_template("scenario_simulation.html")
+
 
 @app.route("/ai_generated_adjustments")
 @login_required
 def ai_generated_adjustments():
     return render_template("ai_generated_adjustments.html")
 
+
+# deepseek/deepseek-chat:free
+@app.route("/send_message", methods=["POST"])
+@login_required
+def send_message():
+    if "chat_id" in request.form:
+        chat_id = uuid.UUID(request.form["chat_id"])
+    else:
+        chat_id = uuid.uuid4()
+    username = session["username"]
+    message = request.form["message"]
+    history = (
+        ChatHistory.select()
+        .where(
+            (ChatHistory.user == username) & (ChatHistory.chat_id == chat_id)
+        )
+        .order_by(ChatHistory.message_id)
+    )
+
+    if not history:
+        chat_title = message[:32]
+    else:
+        chat_title = history[0].chat_title
+
+    ChatHistory.create(
+        user=username,
+        chat_id=chat_id,
+        chat_title=chat_title,
+        message=json.dumps({"role": "user", "content": message}),
+        created_at=datetime.now(),
+    )
+    history = [json.loads(h.message) for h in history]
+    history.append({"role": "user", "content": message})
+
+    def generate():
+        stream = client.chat.completions.create(
+            extra_body={},
+            model="deepseek/deepseek-chat:free",
+            messages=history,
+            stream=True,
+        )
+
+        assistant_response = ""
+        for chunk in stream:
+            content = chunk.choices[0].delta.content or ""
+            assistant_response += content
+            yield content
+
+        ChatHistory.create(
+            user=username,
+            chat_id=chat_id,
+            chat_title=chat_title,
+            message=json.dumps({"role": "assistant", "content": assistant_response}),
+            created_at=datetime.now(),
+        )
+
+    return Response(generate(), mimetype="text/event-stream")
+
+
+@app.route("/new_chat")
+@login_required
+def new_chat():
+    return redirect(url_for("ai_chatbot"))
+
+
 @app.route("/ai_chatbot")
 @login_required
 def ai_chatbot():
-    return render_template("ai_chatbot.html")
+    chats = (
+        ChatHistory.select(
+            ChatHistory.chat_id, ChatHistory.chat_title, ChatHistory.created_at
+        )
+        .where(ChatHistory.user == session["username"])
+        .group_by(ChatHistory.chat_id)
+        .order_by(ChatHistory.created_at.desc())
+    )
+    chats = [
+        {"chat_id": chat.chat_id, "chat_title": chat.chat_title, "created_at": chat.created_at}
+        for chat in chats
+    ]
+
+    chat_id = request.args.get("chat_id")
+    if chat_id:
+        chat_id = uuid.UUID(chat_id)
+        messages = (
+            ChatHistory.select()
+            .where(
+                (ChatHistory.user == session["username"])
+                & (ChatHistory.chat_id == chat_id)
+            )
+            .order_by(ChatHistory.message_id)
+        )
+
+        if not messages:
+            return redirect(url_for("ai_chatbot"))
+
+        chat_title = messages[0].chat_title
+        history = [json.loads(msg.message) for msg in messages]
+    else:
+        chat_title = None
+        history = []
+
+    return render_template("ai_chatbot.html", chats=chats, history=history, chat_title=chat_title)
+
 
 @app.route("/homepage")
 def home():
@@ -148,6 +272,7 @@ def home():
         return render_template("homepage.html", username=session["username"])
     return redirect(url_for("welcome"))
 
+
 @app.errorhandler(404)
 def page_not_found(e):
-    return render_template('404.html'), 404  # A custom 404 error page
+    return render_template("404.html"), 404
