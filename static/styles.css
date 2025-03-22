@@ -693,3 +693,34 @@ button.cta-button:hover {
     border-left-color: rgba(255, 255, 255, 0.4);
     color: rgba(255, 255, 255, 0.8);
 }
+
+/* Header styles for chat interface */
+.header-content {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    justify-content: flex-start;
+}
+
+#back-button {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    margin-right: 15px;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+}
+
+#back-button:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+#chat-header-title {
+    flex: 1;
+    margin: 0;
+}

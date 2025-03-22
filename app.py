@@ -5,12 +5,13 @@ import uuid
 from functools import wraps
 
 from dotenv import load_dotenv
-from flask import Flask, Response, redirect, render_template, request, session, url_for
+from flask import Flask, Response, redirect, render_template, request, session, url_for, jsonify
 from flask_bcrypt import Bcrypt
 from openai import OpenAI
 from peewee import IntegrityError
 
 from model import ChatHistory, User, create_tables, database
+from simulation import simulate_retirement
 
 create_tables()
 load_dotenv()
@@ -150,6 +151,42 @@ def logout():
     return redirect(url_for("welcome"))
 
 
+@app.route("/run_simulation", methods=["POST"])
+@login_required
+def run_simulation():
+    data = request.get_json()
+
+    current_age = int(data.get("current_age", 30))
+    retirement_age = int(data.get("retirement_age", 65))
+    monthly_income = float(data.get("monthly_income", 5000))
+    monthly_expenses = float(data.get("monthly_expenses", 3000))
+    monthly_savings = float(data.get("monthly_savings", 1000))
+    investment_strategy = data.get("investment_strategy", "balanced")
+    retirement_investment_strategy = data.get("retirement_investment_strategy", "conservative")
+    investment_increase = float(data.get("investment_increase", 0))
+    career_switch_impact = float(data.get("career_switch_impact", 0))
+    career_switch_age = int(data.get("career_switch_age", 0))
+    purchase_amount = float(data.get("purchase_amount", 0))
+    purchase_age = int(data.get("purchase_age", 0))
+
+    results = simulate_retirement(
+        current_age, 
+        retirement_age, 
+        monthly_income, 
+        monthly_expenses, 
+        monthly_savings, 
+        investment_strategy, 
+        investment_increase, 
+        career_switch_impact, 
+        purchase_amount,
+        career_switch_age,
+        purchase_age,
+        retirement_investment_strategy
+    )
+
+    return jsonify(results)
+
+
 @app.route("/scenario_simulation")
 @login_required
 def scenario_simulation():
@@ -162,14 +199,16 @@ def ai_generated_adjustments():
     return render_template("ai_generated_adjustments.html")
 
 
-# deepseek/deepseek-chat:free
 @app.route("/send_message", methods=["POST"])
 @login_required
 def send_message():
     if "chat_id" in request.form:
         chat_id = uuid.UUID(request.form["chat_id"])
+        is_new_chat_id = False
     else:
         chat_id = uuid.uuid4()
+        is_new_chat_id = True
+
     username = session["username"]
     message = request.form["message"]
     history = (
@@ -196,6 +235,9 @@ def send_message():
     history.append({"role": "user", "content": message})
 
     def generate():
+        if is_new_chat_id:
+            yield json.dumps({"event": "chat_id", "data": str(chat_id)}) + "\n"
+
         stream = client.chat.completions.create(
             extra_body={},
             model="deepseek/deepseek-chat:free",
@@ -207,7 +249,7 @@ def send_message():
         for chunk in stream:
             content = chunk.choices[0].delta.content or ""
             assistant_response += content
-            yield content
+            yield json.dumps({"event": "message", "data": content}) + "\n"
 
         ChatHistory.create(
             user=username,
@@ -257,13 +299,11 @@ def ai_chatbot():
         if not messages:
             return redirect(url_for("ai_chatbot"))
 
-        chat_title = messages[0].chat_title
         history = [json.loads(msg.message) for msg in messages]
     else:
-        chat_title = None
         history = []
 
-    return render_template("ai_chatbot.html", chats=chats, history=history, chat_title=chat_title)
+    return render_template("ai_chatbot.html", chats=chats, history=history)
 
 
 @app.route("/homepage")

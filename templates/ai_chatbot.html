@@ -7,7 +7,7 @@
     <title>AI Chatbot</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&icon_names=add_comment" />
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&icon_names=add_comment,arrow_back" />
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.7.0/styles/github.min.css">
     <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.7.0/lib/highlight.min.js"></script>
@@ -48,13 +48,14 @@
 
         <div class="main-content">
             <header>
-                <h1 id="chat-header-title">
-                    {% if chat_title %}
-                    {{ chat_title }}
-                    {% else %}
-                    AI Chatbot: Your Financial Assistant
-                    {% endif %}
-                </h1>
+                <div class="header-content">
+                    <button id="back-button" onclick="window.location.href='{{ url_for('features') }}'" title="Back to Features">
+                        <span class="material-symbols-outlined">arrow_back</span>
+                    </button>
+                    <h1 id="chat-header-title">
+                        AI Chatbot: Your Financial Assistant
+                    </h1>
+                </div>
             </header>
 
             <main>
@@ -109,7 +110,8 @@
     <script>
         const chatBox = document.getElementById('chatbox');
         const input = document.getElementById('user-input');
-        const chatHeaderTitle = document.getElementById('chat-header-title');
+        const urlParams = new URLSearchParams(window.location.search);
+        var chatId = urlParams.get('chat_id');
 
         marked.setOptions({
             highlight: function (code, language) {
@@ -187,12 +189,9 @@
         }
 
         function sendMessage() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const chatId = urlParams.get('chat_id')
             const message = input.value.trim();
             if (!message) return;
 
-            chatHeaderTitle.textContent = message.substring(0, 32);
             input.disabled = true;
             document.querySelector('#send-btn').disabled = true;
             input.value = '';
@@ -217,17 +216,30 @@
                     return reader.read().then(({ done, value }) => {
                         if (done) {
                             updateMessage(tempId, assistantContent);
-
-                            if (!urlParams.has('chat_id')) {
-                                addChatToSidebar(chatId, message);
-                            }
                             return;
                         }
 
                         const chunk = decoder.decode(value);
-                        assistantContent += chunk;
-
-                        updateMessage(tempId, assistantContent + '▌');
+                        const lines = chunk.split('\n');
+                        for (const line of lines) {
+                            try {
+                                const data = JSON.parse(line.trim());
+                                switch (data.event) {
+                                    case 'message':
+                                        assistantContent += data.data;
+                                        updateMessage(tempId, assistantContent + '▌');
+                                        break;
+                                    case 'chat_id':
+                                        chatId = data.data;
+                                        addChatToSidebar(chatId, message);
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            } catch (error) {
+                                continue
+                            }
+                        }
 
                         chatBox.scrollTop = chatBox.scrollHeight;
 

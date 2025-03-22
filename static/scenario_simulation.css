@@ -1,0 +1,201 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f7fc;
+    color: #333;
+}
+
+header {
+    background-color: #0066b2;
+    color: white;
+    text-align: center;
+    padding: 2rem 1rem;
+    margin-bottom: 2rem;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2.2rem;
+}
+
+header p {
+    margin: 0.5rem 0 0;
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+}
+
+section {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+}
+
+#simulation-form {
+    flex: 1 1 400px;
+}
+
+#simulation-results {
+    flex: 2 1 600px;
+    display: none;
+}
+
+#simulation-results.show {
+    display: block;
+}
+
+h2 {
+    color: #0066b2;
+    margin-top: 0;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+label {
+    font-weight: 600;
+    color: #555;
+}
+
+input, select {
+    padding: 0.75rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+input:focus, select:focus {
+    outline: none;
+    border-color: #0066b2;
+    box-shadow: 0 0 0 2px rgba(0, 102, 178, 0.2);
+}
+
+.cta-button {
+    margin-top: 1rem;
+    padding: 0.75rem 1.5rem;
+    background-color: #0066b2;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.cta-button:hover {
+    background-color: #0055a4;
+}
+
+.summary-container {
+    margin-bottom: 2rem;
+}
+
+.key-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin: 1.5rem 0;
+}
+
+.stat {
+    background-color: #f4f7fc;
+    border-radius: 8px;
+    padding: 1.5rem;
+    flex: 1 1 200px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.stat-value {
+    display: block;
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #0066b2;
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.result-messages {
+    background-color: #f8f9fa;
+    border-left: 4px solid #0066b2;
+    padding: 1rem;
+    margin: 1.5rem 0;
+}
+
+.result-messages p {
+    margin: 0.5rem 0;
+}
+
+#result-chart {
+    margin-top: 2rem;
+    border-top: 1px solid #eee;
+    padding-top: 1.5rem;
+}
+
+.loading {
+    text-align: center;
+    padding: 2rem;
+    color: #666;
+}
+
+.loading::after {
+    content: "";
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid #ccc;
+    border-radius: 50%;
+    border-top-color: #0066b2;
+    animation: spinner 1s linear infinite;
+    margin-left: 0.5rem;
+}
+
+.error {
+    color: #d32f2f;
+    text-align: center;
+    padding: 1rem;
+}
+
+@keyframes spinner {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@media (max-width: 768px) {
+    main {
+        flex-direction: column;
+    }
+    
+    section {
+        flex: 1 1 100%;
+    }
+    
+    .key-stats {
+        flex-direction: column;
+    }
+}
