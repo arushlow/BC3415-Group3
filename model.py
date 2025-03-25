@@ -7,7 +7,8 @@ from peewee import (
     UUIDField,
     ForeignKeyField,
     DecimalField,
-    IntegerField
+    IntegerField,
+    DateField
 )
 
 database = SqliteDatabase("fintwin.db")
@@ -48,10 +49,16 @@ class DataOverview(BaseModel):
     bank_name_short = CharField()
     account_type = CharField()
     balance = DecimalField(decimal_places=2)
-
     
+class DataTransaction(BaseModel):
+    account_id = AutoField()
+    user = ForeignKeyField(User, backref="transaction", field="account_id")
+    bank_account = ForeignKeyField(DataOverview, backref="transaction")
+    date = DateField()
+    description = CharField()
+    amount = DecimalField(decimal_places=2)
 
 
 def create_tables():
     with database:
-        database.create_tables([User, Investment, ChatHistory, DataOverview])
+        database.create_tables([User, Investment, ChatHistory, DataOverview, DataTransaction])
