@@ -6,7 +6,8 @@ from peewee import (
     CharField,
     UUIDField,
     ForeignKeyField,
-    DecimalField
+    DecimalField,
+    IntegerField
 )
 
 database = SqliteDatabase("fintwin.db")
@@ -42,7 +43,7 @@ class ChatHistory(BaseModel):
     
 class DataOverview(BaseModel):
     user = ForeignKeyField(User, backref="overview")
-    account_id = UUIDField()
+    account_id = IntegerField()
     bank_name = CharField()
     bank_name_short = CharField()
     account_type = CharField()

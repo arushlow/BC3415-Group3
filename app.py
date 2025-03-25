@@ -1,7 +1,9 @@
 from datetime import datetime
 import json
 import os
+from io import StringIO
 import uuid
+import csv
 from functools import wraps
 
 from dotenv import load_dotenv
@@ -10,7 +12,7 @@ from flask_bcrypt import Bcrypt
 from openai import OpenAI
 from peewee import IntegrityError
 
-from model import ChatHistory, User, create_tables, database
+from model import ChatHistory, User, DataOverview, create_tables, database
 from simulation import simulate_retirement
 
 create_tables()
@@ -311,6 +313,51 @@ def home():
     if "username" in session:
         return render_template("homepage.html", username=session["username"])
     return redirect(url_for("welcome"))
+
+@app.route("/dashboard")
+def dashboard():
+    if "username" in session:
+        return render_template("homepage.html", username=session["username"])
+    return redirect(url_for("welcome"))
+
+@app.route("/data")
+def data():
+    return render_template("data.html")
+
+@app.route("/data_overview", methods=['POST'])
+def data_overview():
+    #if 'overview' not in request.files:
+        #return redirect(request.url)
+    
+    file = request.files['overview']
+    
+    if file:
+        file_content = file.stream.read().decode("utf-8-sig")
+        csv_file = StringIO(file_content)
+        csvreader = csv.DictReader(csv_file, delimiter=",")
+        
+        print(f"CSV Headers: {csvreader.fieldnames}")
+        
+        for line in csvreader:
+            print(line)
+            DataOverview.create(
+                user=session["username"],
+                account_id=int(line['Account ID']),
+                bank_name=line['Bank Name'],
+                bank_name_short=line['Bank Name (Short)'],
+                account_type=line['Account Type'],
+                balance=float(line['Balance'].replace(',', ''))
+            )
+            
+    data_overviews = DataOverview.select().where(DataOverview.user == session['username'])
+
+    if data_overviews.exists():
+        for data in data_overviews:
+            print(f"Account ID: {data.account_id}, Bank Name: {data.bank_name}, Balance: {data.balance}")
+    else:
+        print("No data available in DataOverview.")
+    
+    return 'CSV data has been uploaded and processed'
 
 
 @app.errorhandler(404)
