@@ -51,9 +51,9 @@ class DataOverview(BaseModel):
     balance = DecimalField(decimal_places=2)
     
 class DataTransaction(BaseModel):
-    account_id = AutoField()
-    user = ForeignKeyField(User, backref="transaction", field="account_id")
-    bank_account = ForeignKeyField(DataOverview, backref="transaction")
+    transaction_id = AutoField()
+    user = ForeignKeyField(User, backref="transaction")
+    bank_account_id = ForeignKeyField(DataOverview, backref="transaction")
     date = DateField()
     description = CharField()
     amount = DecimalField(decimal_places=2)

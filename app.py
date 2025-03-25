@@ -11,8 +11,9 @@ from flask import Flask, Response, redirect, render_template, request, session, 
 from flask_bcrypt import Bcrypt
 from openai import OpenAI
 from peewee import IntegrityError
+from peewee import *
 
-from model import ChatHistory, User, DataOverview, create_tables, database
+from model import ChatHistory, User, DataOverview, DataTransaction, create_tables, database
 from simulation import simulate_retirement
 
 create_tables()
@@ -336,8 +337,6 @@ def data_overview():
         csv_file = StringIO(file_content)
         csvreader = csv.DictReader(csv_file, delimiter=",")
         
-        print(f"CSV Headers: {csvreader.fieldnames}")
-        
         for line in csvreader:
             balance = float(line['Balance'].replace(',', ''))
             existing = DataOverview.select().where(DataOverview.account_id == int(line['Account ID']), DataOverview.user == session["username"]).first()
@@ -362,6 +361,46 @@ def data_overview():
             print(f"Account ID: {data.account_id}, Bank Name: {data.bank_name}, Balance: {data.balance}")
     else:
         print("No data available in DataOverview.")
+    
+    return 'CSV data has been uploaded and processed'
+
+@app.route("/data_transaction", methods=['POST'])
+def data_transaction():
+    #if 'overview' not in request.files:
+        #return redirect(request.url)
+    
+    file = request.files['transaction']
+    
+    if file:
+        file_content = file.stream.read().decode("utf-8-sig")
+        csv_file = StringIO(file_content)
+        csvreader = csv.DictReader(csv_file, delimiter=",")
+        
+        print(f"CSV Headers: {csvreader.fieldnames}")
+        
+        for line in csvreader:
+            try:
+                bank_account = DataOverview.get(DataOverview.account_id == int(line['Bank Account ID']))
+                print(bank_account)
+                DataTransaction.create(
+                user=session["username"],
+                bank_account_id=bank_account,
+                date=datetime.strptime(line['Date'], '%Y-%m-%d').date(),
+                description=line['Description'],
+                amount=float(line['Amount'].replace(',', '')),
+            )
+            except DataOverview.DoesNotExist:
+                print(f"Account ID {line['Bank Account ID']} does not exist in DataOverview. Skipping transaction.")
+                continue 
+            
+    transactions = DataTransaction.select().where(DataTransaction.user == session["username"])
+
+        # Print out the records from the database
+    print("Added Records in Database:")
+    for transaction in transactions:
+        print(f"Account ID: {transaction.bank_account_id.account_id}, Date: {transaction.date}, "
+            f"Description: {transaction.description}, Amount: {transaction.amount}")
+
     
     return 'CSV data has been uploaded and processed'
 
