@@ -339,15 +339,21 @@ def data_overview():
         print(f"CSV Headers: {csvreader.fieldnames}")
         
         for line in csvreader:
-            print(line)
-            DataOverview.create(
-                user=session["username"],
-                account_id=int(line['Account ID']),
-                bank_name=line['Bank Name'],
-                bank_name_short=line['Bank Name (Short)'],
-                account_type=line['Account Type'],
-                balance=float(line['Balance'].replace(',', ''))
-            )
+            balance = float(line['Balance'].replace(',', ''))
+            existing = DataOverview.select().where(DataOverview.account_id == int(line['Account ID']), DataOverview.user == session["username"]).first()
+            if existing:
+                existing.balance = balance
+                existing.save()
+                print(f"Updated Account ID: {int(line['Account ID'])} with new balance: {balance}")
+            else:
+                DataOverview.create(
+                    user=session["username"],
+                    account_id=int(line['Account ID']),
+                    bank_name=line['Bank Name'],
+                    bank_name_short=line['Bank Name (Short)'],
+                    account_type=line['Account Type'],
+                    balance=balance
+                )
             
     data_overviews = DataOverview.select().where(DataOverview.user == session['username'])
 
