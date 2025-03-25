@@ -35,6 +35,11 @@ class ChatHistory(BaseModel):
     message = CharField()
     created_at = DateTimeField()
     
+    class Meta:
+        indexes = (
+            (("user", "chat_id"), False),
+        )
+    
 class DataOverview(BaseModel):
     user = ForeignKeyField(User, backref="overview")
     account_id = UUIDField()
@@ -43,10 +48,7 @@ class DataOverview(BaseModel):
     account_type = CharField()
     balance = DecimalField(decimal_places=2)
 
-    class Meta:
-        indexes = (
-            (("user", "chat_id"), False),
-        )
+    
 
 
 def create_tables():
