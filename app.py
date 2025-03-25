@@ -13,7 +13,7 @@ from openai import OpenAI
 from peewee import IntegrityError
 from peewee import *
 
-from model import ChatHistory, User, DataOverview, DataTransaction, create_tables, database
+from model import ChatHistory, User, DataOverview, DataTransaction, DataInvestment, create_tables, database
 from simulation import simulate_retirement
 
 create_tables()
@@ -404,6 +404,47 @@ def data_transaction():
     
     return 'CSV data has been uploaded and processed'
 
+@app.route("/data_invest", methods=['POST'])
+def data_invest():
+    #if 'overview' not in request.files:
+        #return redirect(request.url)
+    
+    file = request.files['invest']
+    
+    if file:
+        file_content = file.stream.read().decode("utf-8-sig")
+        csv_file = StringIO(file_content)
+        csvreader = csv.DictReader(csv_file, delimiter=",")
+        
+        print(f"CSV Headers: {csvreader.fieldnames}")
+        
+        for line in csvreader:
+            amount = float(line['Amount Invested'].replace(',', ''))
+            existing = DataInvestment.select().where(DataInvestment.name == line['Investment Name'], DataInvestment.user == session["username"]).first()
+            if existing:
+                existing.amount = amount
+                existing.date = datetime.strptime(line['Investment Date'], '%Y-%m-%d').date()
+                existing.save()
+                print(f"Updated Investment Named: {line['Investment Name']} with new balance: {amount}")
+            else:
+                DataInvestment.create(
+                    user=session["username"],
+                    name=line['Investment Name'],
+                    amount=amount,
+                    date=datetime.strptime(line['Investment Date'], '%Y-%m-%d').date(),
+                )
+
+            
+    invest = DataInvestment.select().where(DataInvestment.user == session["username"])
+
+        # Print out the records from the database
+    print("Added Records in Database:")
+    for investment in invest:
+        print(f"Date: {investment.date}, "
+            f"Name: {investment.name}, Amount: {investment.amount}")
+
+    
+    return 'CSV data has been uploaded and processed'
 
 @app.errorhandler(404)
 def page_not_found(e):

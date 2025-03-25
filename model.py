@@ -57,8 +57,15 @@ class DataTransaction(BaseModel):
     date = DateField()
     description = CharField()
     amount = DecimalField(decimal_places=2)
+    
+class DataInvestment(BaseModel):
+    user = ForeignKeyField(User, backref="invest")
+    name = CharField()
+    amount = DecimalField(decimal_places=2)
+    date = DateField()
+    
 
 
 def create_tables():
     with database:
-        database.create_tables([User, Investment, ChatHistory, DataOverview, DataTransaction])
+        database.create_tables([User, Investment, ChatHistory, DataOverview, DataTransaction, DataInvestment])

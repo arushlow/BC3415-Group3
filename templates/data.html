@@ -27,5 +27,15 @@
             <button type="submit" class="submit-btn">Upload File</button>
         </form>
     </div>
+    <div class="form-container">
+        <h2>Upload CSV for Investments</h2>
+        <form action="/data_invest" method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="invest">Choose CSV file:</label>
+                <input type="file" id="invest" name="invest" accept=".csv" required>
+            </div>
+            <button type="submit" class="submit-btn">Upload File</button>
+        </form>
+    </div>
 </body>
 </html>
