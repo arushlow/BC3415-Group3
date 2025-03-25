@@ -6,6 +6,7 @@ from peewee import (
     CharField,
     UUIDField,
     ForeignKeyField,
+    DecimalField
 )
 
 database = SqliteDatabase("fintwin.db")
@@ -33,6 +34,14 @@ class ChatHistory(BaseModel):
     message_id = AutoField()
     message = CharField()
     created_at = DateTimeField()
+    
+class DataOverview(BaseModel):
+    user = ForeignKeyField(User, backref="overview")
+    account_id = UUIDField()
+    bank_name = CharField()
+    bank_name_short = CharField()
+    account_type = CharField()
+    balance = DecimalField(decimal_places=2)
 
     class Meta:
         indexes = (
@@ -42,4 +51,4 @@ class ChatHistory(BaseModel):
 
 def create_tables():
     with database:
-        database.create_tables([User, Investment, ChatHistory])
+        database.create_tables([User, Investment, ChatHistory, DataOverview])
