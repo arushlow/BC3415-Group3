@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+</head>
+<body>
+    <h1>Dashboard</h1>
+
+    <h2>Bank Account Balances Chart</h2>
+    
+    {% if message %}
+        <p>{{ message }}</p>
+    {% else %}
+        <!-- Display the graph -->
+        <img src="{{ url_for('view_invest') }}" alt="Account Balance Chart">
+    {% endif %}
+
+</body>
+</html>

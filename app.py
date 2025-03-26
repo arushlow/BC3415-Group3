@@ -1,10 +1,12 @@
 from datetime import datetime
 import json
 import os
-from io import StringIO
+from io import StringIO, BytesIO
 import uuid
 import csv
 from functools import wraps
+from decimal import Decimal
+import matplotlib.pyplot as plt
 
 from dotenv import load_dotenv
 from flask import Flask, Response, redirect, render_template, request, session, url_for, jsonify
@@ -315,11 +317,119 @@ def home():
         return render_template("homepage.html", username=session["username"])
     return redirect(url_for("welcome"))
 
+
 @app.route("/dashboard")
 def dashboard():
-    if "username" in session:
-        return render_template("homepage.html", username=session["username"])
-    return redirect(url_for("welcome"))
+    return render_template("dashboard.html", username=session["username"])
+
+@app.route("/view_overview")
+def view_overview():
+    # Fetch data for the user
+    overview = DataOverview.select().where(DataOverview.user == session["username"])
+
+    # Initialize the dictionary to store bank account data
+    bank_accounts = {}
+
+    # Collect the data for each bank and account type
+    for data in overview:
+        bank_name = data.bank_name
+        account_type = data.account_type
+        balance = data.balance  # balance is likely a Decimal, so we need to ensure correct handling
+        
+        # If bank_name doesn't exist in the dictionary, create a new entry
+        if bank_name not in bank_accounts:
+            bank_accounts[bank_name] = {}
+
+        bank_accounts[bank_name][account_type] = balance
+
+    # Create a list of bank names
+    bank_names = list(bank_accounts.keys())
+
+    # Create a dictionary to hold account types for each bank
+    account_types = {bank: sorted(account_type_dict.keys()) for bank, account_type_dict in bank_accounts.items()}
+
+    # Create a dictionary to hold balances for each bank, grouped by account type
+    balances = {bank: {account_type: Decimal(0) for account_type in account_types[bank]} for bank in bank_names}
+
+    # Populate balances with the correct data
+    for bank_name, account_type_dict in bank_accounts.items():
+        for account_type, balance in account_type_dict.items():
+            balances[bank_name][account_type] = balance
+
+    # Generate the plot
+    plt.figure(figsize=(12, 6))
+
+    # Define the colors for the bars
+    colors = plt.cm.Paired(range(len(account_types)))
+
+    # Initialize bottom values for stacking the bars
+    bottom_values = [0] * len(bank_names)
+
+    # Loop over each account type to plot the stacked bars
+    for i, account_type in enumerate(account_types):
+        # Get the balances for the current account type across all banks
+        account_type_balances = [
+            float(balances[bank].get(account_type, Decimal(0))) for bank in bank_names]  # Convert Decimal to float
+        
+        # Plot the bar for the current account type
+        plt.bar(bank_names, account_type_balances, bottom=bottom_values, label=account_type, color=colors[i])
+        
+        # Update the bottom values for the next stacked bar
+        bottom_values = [bottom + current for bottom, current in zip(bottom_values, account_type_balances)]
+
+    # Add bank total balance to the x-axis label
+    bank_labels = []
+    for i, bank_name in enumerate(bank_names):
+        # Calculate the total balance for the bank
+        total_balance = sum([float(balances[bank_name].get(account_type, Decimal(0))) for account_type in account_types[bank_name]])  # Convert Decimal to float
+        bank_labels.append(f'{bank_name}\n({total_balance:.2f})')
+
+    # Set x-axis labels with bank names and total balance
+    plt.xticks(ticks=range(len(bank_names)), labels=bank_labels, rotation=45, ha='right')
+
+    # Label the axes and the title
+    plt.xlabel('Bank Name')
+    plt.ylabel('Balance')
+    plt.title('Bank Account Balances by Account Type')
+
+    # Adjust the layout to fit the labels
+    plt.tight_layout()
+
+    # Display the legend for the account types
+    plt.legend(title='Account Type')
+
+    # Save the plot to a BytesIO object to avoid saving it to a file
+    img = BytesIO()
+    plt.savefig(img, format='png')
+    img.seek(0)  # Rewind the buffer to the beginning
+
+    # Return the image as a response
+    return Response(img, mimetype='image/png')
+
+@app.route("/view_invest")
+def view_invest():
+    username = session['username']
+    
+    data = DataInvestment.select().where(DataInvestment.user == username)
+    print(f'This is the num of lines {data.count()}')
+    invest_groups = {}
+    for invest in data:
+        invest_type = invest.invest_type
+        amount = invest.amount
+        print(invest_type)
+        if invest_type not in invest_groups:
+            invest_groups[invest_type] = 0
+        invest_groups[invest_type] += amount
+    print(invest_groups)    
+    plt.figure(figsize=(8,8))
+    plt.pie(invest_groups.values(), labels=invest_groups.keys(), autopct='%1.1f%%', startangle=140)
+    plt.title(f'{username} Investment Distribution')
+    
+    img = BytesIO()
+    plt.savefig(img, format='png')
+    img.seek(0)
+        
+    return Response(img, mimetype='image/png')
 
 @app.route("/data")
 def data():
@@ -430,6 +540,7 @@ def data_invest():
                 DataInvestment.create(
                     user=session["username"],
                     name=line['Investment Name'],
+                    invest_type=line['Investment Type'],
                     amount=amount,
                     date=datetime.strptime(line['Investment Date'], '%Y-%m-%d').date(),
                 )
