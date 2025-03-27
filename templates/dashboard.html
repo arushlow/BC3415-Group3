@@ -1,21 +1,113 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
 </head>
+
 <body>
     <h1>Dashboard</h1>
 
     <h2>Bank Account Balances Chart</h2>
-    
+
     {% if message %}
-        <p>{{ message }}</p>
+    <p>{{ message }}</p>
     {% else %}
-        <!-- Display the graph -->
-        <img src="{{ url_for('view_invest') }}" alt="Account Balance Chart">
+    <!-- Display the graph -->
+    <img src="{{ url_for('view_invest') }}" alt="Account Balance Chart">
     {% endif %}
 
+    <table>
+        <tr>
+            <td>Bonds</td>
+        </tr>
+        <tr>
+            <td>Investment Name</td>
+            <td>Amount Invested</td>
+            <td>Date Invested</td>
+        </tr>
+        {% for invest in investment %}
+        {% if invest.invest_type == "Bonds" %}
+        <tr>
+            <td>{{invest.name}}</td>
+            <td>{{invest.amount}}</td>
+            <td>{{invest.date}}</td>
+        </tr>
+        {% endif %}
+        {% endfor %}
+        <tr>
+            <td>Total: ${{invest_totals["Bonds"]}}</td>
+        </tr>
+    </table>
+    <table>
+        <tr>
+            <td>ETFs</td>
+        </tr>
+        <tr>
+            <td>Investment Name</td>
+            <td>Amount Invested</td>
+            <td>Date Invested</td>
+        </tr>
+        {% for invest in investment %}
+        {% if invest.invest_type == "ETF" %}
+        <tr>
+            <td>{{invest.name}}</td>
+            <td>{{invest.amount}}</td>
+            <td>{{invest.date}}</td>
+        </tr>
+        {% endif %}
+        {% endfor %}
+        <tr>
+            <td>Total: ${{invest_totals["ETF"]}}</td>
+        </tr>
+    </table>
+    <table>
+        <tr>
+            <td>Mutual Funds</td>
+        </tr>
+        <tr>
+            <td>Investment Name</td>
+            <td>Amount Invested</td>
+            <td>Date Invested</td>
+        </tr>
+        {% for invest in investment %}
+        {% if invest.invest_type == "Mutual Fund" %}
+        <tr>
+            <td>{{invest.name}}</td>
+            <td>{{invest.amount}}</td>
+            <td>{{invest.date}}</td>
+        </tr>
+        {% endif %}
+        {% endfor %}
+        <tr>
+            <td>Total: ${{invest_totals["Mutual Fund"]}}</td>
+        </tr>
+    </table>
+    <table>
+        <tr>
+            <td>Stocks</td>
+        </tr>
+        <tr>
+            <td>Investment Name</td>
+            <td>Amount Invested</td>
+            <td>Date Invested</td>
+        </tr>
+        {% for invest in investment %}
+        {% if invest.invest_type == "Stock" %}
+        <tr>
+            <td>{{invest.name}}</td>
+            <td>{{invest.amount}}</td>
+            <td>{{invest.date}}</td>
+        </tr>
+        {% endif %}
+        {% endfor %}
+        <tr>
+            <td>Total: ${{invest_totals["Stock"]}}</td>
+        </tr>
+    </table>
+
 </body>
+
 </html>

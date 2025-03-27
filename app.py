@@ -320,7 +320,17 @@ def home():
 
 @app.route("/dashboard")
 def dashboard():
-    return render_template("dashboard.html", username=session["username"])
+    data_invest = DataInvestment.select().where(DataInvestment.user == session['username'])
+    invest_totals = {
+        "Bonds": 0,
+        "ETF": 0,
+        "Mutual Fund": 0,
+        "Stock": 0  
+    }
+    for invest in data_invest:
+        invest_totals[invest.invest_type] += invest.amount
+    
+    return render_template("dashboard.html", investment=data_invest, invest_totals=invest_totals)
 
 @app.route("/view_overview")
 def view_overview():
@@ -411,16 +421,13 @@ def view_invest():
     username = session['username']
     
     data = DataInvestment.select().where(DataInvestment.user == username)
-    print(f'This is the num of lines {data.count()}')
     invest_groups = {}
     for invest in data:
         invest_type = invest.invest_type
         amount = invest.amount
-        print(invest_type)
         if invest_type not in invest_groups:
             invest_groups[invest_type] = 0
-        invest_groups[invest_type] += amount
-    print(invest_groups)    
+        invest_groups[invest_type] += amount   
     plt.figure(figsize=(8,8))
     plt.pie(invest_groups.values(), labels=invest_groups.keys(), autopct='%1.1f%%', startangle=140)
     plt.title(f'{username} Investment Distribution')
