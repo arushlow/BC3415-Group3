@@ -240,7 +240,7 @@ def send_message():
 
         stream = client.chat.completions.create(
             extra_body={},
-            model="deepseek/deepseek-chat:free",
+            model="deepseek/deepseek-chat-v3-0324:free",
             messages=history,
             stream=True,
         )
