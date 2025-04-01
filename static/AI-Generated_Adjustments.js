@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const recommendationDiv = document.getElementById("recommendation-summary");
 
     form.addEventListener("submit", async function (event) {
-        event.preventDefault();
+        event.preventDefault(); // Prevent the default form submission
 
         const formData = {
             income: parseFloat(document.getElementById("income").value),
@@ -24,28 +24,7 @@ document.addEventListener("DOMContentLoaded", function () {
             if (!response.ok) throw new Error("Network response was not ok");
 
             const result = await response.json();
-
-function deleteHistory() {
-    const confirmation = confirm("Are you sure you want to delete all chat history?");
-    if (confirmation) {
-        fetch('/delete_chat_history', {
-            method: 'DELETE',
-        }).then(response => {
-            if (response.ok) {
-                location.reload();  // Reload the page to reflect the changes
-            } else {
-                alert("Failed to delete history. Please try again.");
-            }
-        }).catch(error => {
-            console.error("Error deleting history:", error);
-            alert("An error occurred while trying to delete history.");
-        });
-    }
-}
-
-
-
-            // Handle response and display results
+            
             if (result.error) {
                 recommendationDiv.innerHTML = `<p style="color:red;">${result.error}</p>`;
             } else {
