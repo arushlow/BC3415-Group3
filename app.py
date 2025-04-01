@@ -329,7 +329,7 @@ def home():
     return render_template("ai_generated_adjustments.html")
 
 @app.route('/ai_generated_adjustments', methods=['POST'])
-def /ai_generated_adjustments():
+def ai_generated_adjustments():
     data = request.get_json()
 
     # Extract user financial data
