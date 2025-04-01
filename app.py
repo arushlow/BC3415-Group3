@@ -326,7 +326,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def home():
-    return render_template("ai_adjustments.html")
+    return render_template("ai_generated_adjustments.html")
 
 @app.route('/ai-adjustments', methods=['POST'])
 def ai_adjustments():
