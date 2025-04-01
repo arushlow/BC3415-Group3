@@ -347,7 +347,7 @@ footer {
 #ai-adjustments-form h2 {
     font-size: 1.8em;
     margin-bottom: 15px;
-    color: #003366;
+    color: #007BFF;
 }
 
 .input-group {
@@ -381,7 +381,7 @@ footer {
 }
 
 button.cta-button {
-    background-color: #003366; /* Deep blue */
+    background-color: #007BFF; /* Deep blue */
     color: white;
     border: none;
     padding: 12px 20px;
