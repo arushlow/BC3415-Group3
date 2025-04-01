@@ -5,19 +5,17 @@ document.addEventListener("DOMContentLoaded", function () {
     form.addEventListener("submit", async function (event) {
         event.preventDefault();
 
-        // Collect form data
         const formData = {
-            income: document.getElementById("income").value,
-            expenses: document.getElementById("expenses").value,
-            savings: document.getElementById("savings").value,
-            investments: document.getElementById("investments").value,
-            debt: document.getElementById("debt").value,
-            risk_tolerance: document.getElementById("risk-tolerance").value,
-            investment_goal: document.getElementById("investment-goal").value
+            income: parseFloat(document.getElementById("income").value),
+            expenses: parseFloat(document.getElementById("expenses").value),
+            savings: parseFloat(document.getElementById("savings").value),
+            investments: parseFloat(document.getElementById("investments").value),
+            debt: parseFloat(document.getElementById("debt").value),
+            risk_tolerance: document.getElementById("risk-tolerance").value
         };
 
         try {
-            const response = await fetch("//ai_generated_adjustments", {
+            const response = await fetch("/ai-adjustments", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(formData)
@@ -32,10 +30,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 <p><strong>Investment Strategy:</strong> ${result.investment_strategy}</p>
                 <p><strong>Optimal Savings Plan:</strong> ${result.savings_plan}</p>
                 <p><strong>Debt Repayment Strategy:</strong> ${result.debt_strategy}</p>
-                <p><strong>Projected Growth:</strong> ${result.projected_growth}%</p>
+                <p><strong>Projected Growth:</strong> SGD ${result.projected_growth}</p>
             `;
         } catch (error) {
-            recommendationDiv.innerHTML = `<p style="color:red;">Error fetching recommendations.</p>`;
+            recommendationDiv.innerHTML = `<p style="color:red;">Error fetching recommendations. Try again.</p>`;
             console.error("Fetch error:", error);
         }
     });
