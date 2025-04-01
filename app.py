@@ -197,31 +197,41 @@ def scenario_simulation():
 @login_required
 def ai_generated_adjustments():
     if request.method == "POST":
-        data = request.get_json()
-        income = int(data.get("income", 0))
-        expenses = int(data.get("expenses", 0))
-        savings = int(data.get("savings", 0))
-        investments = int(data.get("investments", 0))
-        debt = int(data.get("debt", 0))
-        risk_tolerance = data.get("risk_tolerance", "medium")
-        risk_mapping = {
-            "low": "Increase bond allocation, minimize high-risk assets",
-            "medium": "Balanced stock & bond mix with ETFs",
-            "high": "Higher stock allocation, potential for crypto or startups"
-        }
-        investment_strategy = risk_mapping.get(risk_tolerance, "Balanced portfolio")
-        savings_suggestion = income * 0.2 if expenses < income else "Reduce expenses to save more"
-        debt_strategy = "Prioritize high-interest debt first" if debt > 0 else "No major debts, focus on investments"
-        projected_growth = round((investments + savings) * 0.05, 2)
-        response = {
-            "investment_strategy": investment_strategy,
-            "savings_plan": f"Save at least {savings_suggestion} per month",
-            "debt_strategy": debt_strategy,
-            "projected_growth": projected_growth
-        }
-        return jsonify(response)
-    return render_template("ai_generated_adjustments.html")
+        try:
+            data = request.get_json()
+            logging.debug(f"Received data: {data}")
 
+            if not data:
+                return jsonify({"error": "No data received"}), 400
+
+            income = int(data.get("income", 0))
+            expenses = int(data.get("expenses", 0))
+            savings = int(data.get("savings", 0))
+            investments = int(data.get("investments", 0))
+            debt = int(data.get("debt", 0))
+            risk_tolerance = data.get("risk_tolerance", "medium")
+            
+            risk_mapping = {
+                "low": "Increase bond allocation, minimize high-risk assets",
+                "medium": "Balanced stock & bond mix with ETFs",
+                "high": "Higher stock allocation, potential for crypto or startups"
+            }
+            investment_strategy = risk_mapping.get(risk_tolerance, "Balanced portfolio")
+            savings_suggestion = income * 0.2 if expenses < income else "Reduce expenses to save more"
+            debt_strategy = "Prioritize high-interest debt first" if debt > 0 else "No major debts, focus on investments"
+            projected_growth = round((investments + savings) * 0.05, 2)
+            
+            response = {
+                "investment_strategy": investment_strategy,
+                "savings_plan": f"Save at least {savings_suggestion} per month",
+                "debt_strategy": debt_strategy,
+                "projected_growth": projected_growth
+            }
+            return jsonify(response)
+        except Exception as e:
+            logging.error(f"Error processing request: {e}")
+            return jsonify({"error": "An error occurred while processing your request."}), 500
+    return render_template("ai_generated_adjustments.html")
 
 @app.route("/send_message", methods=["POST"])
 @login_required
