@@ -194,7 +194,7 @@ def scenario_simulation():
     return render_template("scenario_simulation.html")
 
 
-@app.route("/ai_generated_adjustments", methods=["POST"])
+@app.route("/ai_generated_adjustments", methods=["GET", "POST"])
 @login_required
 def ai_generated_adjustments():
     if request.method == "POST":
@@ -271,7 +271,6 @@ def ai_generated_adjustments():
         except Exception as e:
             logging.error(f"Error processing request: {e}", exc_info=True)
             return jsonify({"error": "An error occurred while processing your request."}), 500
-
     return render_template("ai_generated_adjustments.html")
 
 @app.route("/send_message", methods=["POST"])
