@@ -48,6 +48,11 @@
         <button type="submit" class="cta-button">Get AI Suggestions</button>
     </form>
 
-    <div id="recommendation-summary"></div>
-</body>
-</html>
+    <div id="recommendation-summary">
+        <h3>AI Recommendations</h3>
+        <p><strong>Investment Strategy:</strong> {{ investment_strategy }}</p>
+        <p><strong>Optimal Savings Plan:</strong> {{ savings_plan }}</p>
+        <p><strong>Debt Repayment Strategy:</strong> {{ debt_strategy }}</p>
+        <p><strong>Projected Growth:</strong> SGD {{ projected_growth }}</p>
+    </div>
+    

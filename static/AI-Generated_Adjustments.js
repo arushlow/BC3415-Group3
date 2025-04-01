@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             const result = await response.json();
 
-            // Handling response data and rendering the results
+            // Handle response and display results
             if (result.error) {
                 recommendationDiv.innerHTML = `<p style="color:red;">${result.error}</p>`;
             } else {

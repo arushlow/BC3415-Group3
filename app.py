@@ -194,7 +194,7 @@ def scenario_simulation():
     return render_template("scenario_simulation.html")
 
 
-@app.route("/ai_generated_adjustments", methods=["GET", "POST"])
+@app.route("/ai_generated_adjustments", methods=["POST"])
 @login_required
 def ai_generated_adjustments():
     if request.method == "POST":
@@ -226,23 +226,37 @@ def ai_generated_adjustments():
             }
             investment_strategy = risk_mapping.get(risk_tolerance, "Balanced portfolio")
 
-            # Savings Strategy based on income and expenses
-            suggested_savings_percentage = 0.20  # Default 20% of income should be saved
+            # Savings Plan Logic - More dynamic
+            savings_suggestion = 0
             if expenses > income:
-                savings_suggestion = "Reduce expenses to save more"
+                savings_suggestion = "Reduce expenses to save more."
             else:
-                savings_suggestion = f"Save at least {income * suggested_savings_percentage} SGD per month"
+                suggested_savings_percentage = 0.20  # Default 20% savings suggestion
+                if income > 5000:
+                    suggested_savings_percentage = 0.25  # Suggest 25% savings for higher income
+                savings_suggestion = f"Save at least {income * suggested_savings_percentage} SGD per month."
 
-            # Debt Repayment Strategy: Prioritize high-interest debts
+            # Debt Repayment Strategy - More specific
             debt_strategy = ""
             if debt > 0:
-                # Assuming user has a list of debts and their interest rates, prioritize high-interest debt
-                debt_strategy = "Prioritize paying off high-interest debt first."
+                # Calculate debt-to-income ratio for prioritizing strategy
+                debt_to_income_ratio = debt / income
+                if debt_to_income_ratio > 0.5:
+                    debt_strategy = "You have a high debt-to-income ratio. Prioritize paying off high-interest debts first."
+                else:
+                    debt_strategy = "Focus on paying off high-interest debt, then consider investing."
             else:
                 debt_strategy = "No major debts, focus on building investments."
 
-            # Projected Growth Estimate: Assume a 5% return rate on investments and savings
-            projected_growth = round((investments + savings) * 0.05, 2)
+            # Projected Growth Estimate - More personalized
+            projected_growth = 0
+            if investments > 0 or savings > 0:
+                return_rate = 0.05  # Default 5% return rate
+                if risk_tolerance == "high":
+                    return_rate = 0.08  # Higher return rate for high-risk tolerance
+                elif risk_tolerance == "low":
+                    return_rate = 0.03  # Lower return rate for low-risk tolerance
+                projected_growth = round((investments + savings) * return_rate, 2)
 
             response = {
                 "investment_strategy": investment_strategy,
@@ -253,14 +267,12 @@ def ai_generated_adjustments():
             logging.debug(f"Response: {response}")
 
             return jsonify(response)
+
         except Exception as e:
             logging.error(f"Error processing request: {e}", exc_info=True)
             return jsonify({"error": "An error occurred while processing your request."}), 500
 
     return render_template("ai_generated_adjustments.html")
-
-
-
 
 @app.route("/send_message", methods=["POST"])
 @login_required
