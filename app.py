@@ -352,6 +352,17 @@ def ai_chatbot():
 
     return render_template("ai_chatbot.html", chats=chats, history=history)
 
+@app.route("/delete_chat_history", methods=["POST"])
+@login_required
+def delete_chat_history():
+    try:
+        username = session["username"]
+        ChatHistory.delete().where(ChatHistory.user == username).execute()
+        return jsonify({"message": "Chat history cleared successfully"}), 200
+    except Exception as e:
+        logging.error(f"Error clearing chat history: {e}", exc_info=True)
+        return jsonify({"error": "An error occurred while clearing chat history"}), 500
+
 
 @app.route("/homepage")
 def home():
