@@ -1,15 +1,10 @@
 /* General Page Styling */
-.header-box {
-    background: #007bff;
+header {
+    background-color: #0066b2;
     color: white;
     text-align: center;
-    padding: 15px;
-    width: 90%;
-    max-width: 450px;
-    border-radius: 8px 8px 0 0;
-    font-size: 20px;
-    font-weight: bold;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 2rem 1rem;
+    margin-bottom: 2rem;
 }
 
 body {
