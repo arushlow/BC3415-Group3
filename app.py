@@ -319,3 +319,53 @@ def page_not_found(e):
 
 if __name__ == "__main__":
     app.run(debug=True)
+
+from flask import Flask, render_template, request, jsonify
+
+app = Flask(__name__)
+
+@app.route('/')
+def home():
+    return render_template("ai_adjustments.html")
+
+@app.route('/ai-adjustments', methods=['POST'])
+def ai_adjustments():
+    data = request.get_json()
+
+    # Extract user financial data
+    income = int(data.get("income", 0))
+    expenses = int(data.get("expenses", 0))
+    savings = int(data.get("savings", 0))
+    investments = int(data.get("investments", 0))
+    debt = int(data.get("debt", 0))
+    risk_tolerance = data.get("risk_tolerance")
+    investment_goal = data.get("investment_goal")
+
+    # Investment strategy recommendation
+    risk_mapping = {
+        "low": "Increase bond allocation, minimize high-risk assets",
+        "medium": "Balanced stock & bond mix with ETFs",
+        "high": "Higher stock allocation, potential for crypto or startups"
+    }
+    investment_strategy = risk_mapping[risk_tolerance]
+
+    # Savings plan recommendation
+    savings_suggestion = income * 0.2 if expenses < income else "Reduce expenses to save more"
+    
+    # Debt repayment strategy
+    debt_strategy = "Prioritize high-interest debt first" if debt > 0 else "No major debts, focus on investments"
+
+    # Simulated projected financial growth
+    projected_growth = round((investments + savings) * 0.05, 2)  # Example 5% annual return
+
+    response = {
+        "investment_strategy": investment_strategy,
+        "savings_plan": f"Save at least {savings_suggestion} SGD per month",
+        "debt_strategy": debt_strategy,
+        "projected_growth": projected_growth
+    }
+
+    return jsonify(response)
+
+if __name__ == "__main__":
+    app.run(debug=True)

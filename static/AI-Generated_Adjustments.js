@@ -1,34 +1,42 @@
-document.getElementById('preferences-form').addEventListener('submit', function(event) {
-    event.preventDefault(); // Prevent page refresh
+document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById("preferences-form");
+    const recommendationDiv = document.getElementById("recommendation-summary");
 
-    // Get the values from input fields
-    const riskTolerance = document.getElementById('risk-tolerance').value;
-    const investmentGoal = document.getElementById('investment-goal').value;
-    const monthlySavings = parseFloat(document.getElementById('monthly-savings').value) || 0;
+    form.addEventListener("submit", async function (event) {
+        event.preventDefault();
 
-    // Simulate AI-generated financial recommendations (could be based on real algorithms)
-    let aiSuggestions = [];
+        // Collect form data
+        const formData = {
+            income: document.getElementById("income").value,
+            expenses: document.getElementById("expenses").value,
+            savings: document.getElementById("savings").value,
+            investments: document.getElementById("investments").value,
+            debt: document.getElementById("debt").value,
+            risk_tolerance: document.getElementById("risk-tolerance").value,
+            investment_goal: document.getElementById("investment-goal").value
+        };
 
-    // Risk tolerance-based investment adjustments
-    if (riskTolerance === 'low') {
-        aiSuggestions.push('Invest 50% in Bonds, 50% in Savings Account.');
-    } else if (riskTolerance === 'medium') {
-        aiSuggestions.push('Invest 60% in Balanced Mutual Funds, 40% in Bonds.');
-    } else if (riskTolerance === 'high') {
-        aiSuggestions.push('Invest 80% in Stocks, 20% in High-Risk ETFs.');
-    }
+        try {
+            const response = await fetch("/ai-adjustments", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(formData)
+            });
 
-    // Simulate adjusting monthly savings (AI suggests an increase if necessary)
-    if (monthlySavings < 3000) {
-        aiSuggestions.push('Consider increasing monthly savings to at least SGD 3000 for better long-term growth.');
-    }
+            if (!response.ok) throw new Error("Network response was not ok");
 
-    // Display the recommendations
-    document.getElementById('recommendation-summary').innerHTML = aiSuggestions.join('<br/>');
+            const result = await response.json();
 
-    // Simulate a graph or chart update (e.g., Investment Growth Simulation)
-    const recommendationChart = document.getElementById('recommendation-chart');
-    recommendationChart.style.backgroundColor = '#007BFF'; // Change based on results
-
-    // Optional: You can integrate Chart.js or D3.js to create a more dynamic graph
+            recommendationDiv.innerHTML = `
+                <h3>AI Recommendations</h3>
+                <p><strong>Investment Strategy:</strong> ${result.investment_strategy}</p>
+                <p><strong>Optimal Savings Plan:</strong> ${result.savings_plan}</p>
+                <p><strong>Debt Repayment Strategy:</strong> ${result.debt_strategy}</p>
+                <p><strong>Projected Growth:</strong> ${result.projected_growth}%</p>
+            `;
+        } catch (error) {
+            recommendationDiv.innerHTML = `<p style="color:red;">Error fetching recommendations.</p>`;
+            console.error("Fetch error:", error);
+        }
+    });
 });
