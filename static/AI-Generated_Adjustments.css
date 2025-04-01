@@ -1,53 +1,89 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css">
-    <title>AI Adjustments</title>
-</head>
-<body>
-    <div class="main-content">
-        <header>
-            <h1>AI Adjustments</h1>
-        </header>
+/* General Page Styling */
+body {
+    font-family: "Arial", sans-serif;
+    background-color: #f4f4f9;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
 
-        <main>
-            <section id="ai-adjustments-form">
-                <h2>Make AI Adjustments</h2>
-                <form>
-                    <div class="input-group">
-                        <label for="crop-type">Crop Type</label>
-                        <select id="crop-type">
-                            <option value="corn">Corn</option>
-                            <option value="wheat">Wheat</option>
-                            <option value="rice">Rice</option>
-                        </select>
-                    </div>
+/* Heading */
+h1 {
+    color: #333;
+    text-align: center;
+    margin-bottom: 20px;
+}
 
-                    <div class="input-group">
-                        <label for="rainfall">Rainfall (mm)</label>
-                        <input type="number" id="rainfall" name="rainfall" required>
-                    </div>
+/* Form Styling */
+form {
+    background: white;
+    padding: 20px;
+    width: 90%;
+    max-width: 450px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
 
-                    <div class="input-group">
-                        <label for="fertilizer">Fertilizer (kg)</label>
-                        <input type="number" id="fertilizer" name="fertilizer" required>
-                    </div>
+/* Input Fields */
+.input-group {
+    margin-bottom: 15px;
+}
 
-                    <div class="input-group">
-                        <label for="pesticide">Pesticide (kg)</label>
-                        <input type="number" id="pesticide" name="pesticide" required>
-                    </div>
+label {
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+    display: block;
+    margin-bottom: 5px;
+}
 
-                    <button type="submit" class="cta-button">Submit Adjustments</button>
-                </form>
-            </section>
-        </main>
+input, select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
 
-        <footer>
-            <p>&copy; 2025 AI Adjustments. All rights reserved.</p>
-        </footer>
-    </div>
-</body>
-</html>
+/* Submit Button */
+.cta-button {
+    width: 100%;
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 12px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease-in-out;
+}
+
+.cta-button:hover {
+    background: #0056b3;
+}
+
+/* Recommendation Box */
+#recommendation-summary {
+    margin-top: 20px;
+    padding: 15px;
+    background: #e9f7ef;
+    border-left: 5px solid #28a745;
+    width: 90%;
+    max-width: 450px;
+    font-size: 14px;
+    line-height: 1.6;
+    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    form, #recommendation-summary {
+        width: 100%;
+        max-width: 100%;
+        padding: 15px;
+    }
+}
