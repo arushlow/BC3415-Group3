@@ -7,7 +7,7 @@
     <title>AI Chatbot</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&icon_names=add_comment,arrow_back,delete" />
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&icon_names=add_comment,arrow_back" />
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.7.0/styles/github.min.css">
     <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.7.0/lib/highlight.min.js"></script>
@@ -29,9 +29,6 @@
                 <h2>History Conversations</h2>
                 <button id="sidebar-new-chat-btn" onclick="newChat()" title="New Chat">
                     <span class="material-symbols-outlined">add_comment</span>
-                </button>
-                <button id="clear-history-btn" onclick="deleteChatHistory()" title="Clear History">
-                    <span class="material-symbols-outlined">delete</span>
                 </button>
             </div>
             <div class="chat-list">
@@ -112,24 +109,184 @@
     </div>
 
     <script>
-        function deleteChatHistory() {
-            if (!confirm('Are you sure you want to clear your chat history? This action cannot be undone.')) {
-                return;
+        const chatBox = document.getElementById('chatbox');
+        const input = document.getElementById('user-input');
+        const urlParams = new URLSearchParams(window.location.search);
+        var chatId = urlParams.get('chat_id');
+
+        marked.setOptions({
+            highlight: function (code, language) {
+                if (language && hljs.getLanguage(language)) {
+                    return hljs.highlight(code, { language }).value;
+                } else {
+                    return hljs.highlightAuto(code).value;
+                }
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const messageContents = document.querySelectorAll('.message-content');
+            messageContents.forEach(element => {
+                const rawText = element.textContent;
+                element.innerHTML = renderMarkdown(rawText);
+            });
+
+            html = document.querySelector("html");
+            html.scrollTop = html.scrollHeight;
+        });
+
+        function renderMarkdown(text) {
+            return marked.parse(text);
+        }
+
+        function appendMessage(role, content, id) {
+            if (chatBox.classList.contains('empty')) {
+                chatBox.innerHTML = '';
+                chatBox.classList.remove('empty');
             }
 
-            fetch('/delete_chat_history', {
-                method: 'POST'
-            }).then(response => {
-                if (response.ok) {
-                    document.querySelector('.chat-list').innerHTML = '<div class="empty-history">No history</div>';
-                    alert('Chat history cleared successfully!');
+            const div = document.createElement('div');
+            div.className = message ${role}-message;
+
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+
+            if (role === 'user') {
+                contentDiv.textContent = content;
+            } else {
+                contentDiv.textContent = content;
+            }
+
+            div.appendChild(contentDiv);
+            if (id) div.dataset.tempId = id;
+            chatBox.appendChild(div);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function updateMessage(id, content) {
+            const target = document.querySelector([data-temp-id="${id}"]);
+            if (target) {
+                const contentDiv = target.querySelector('.message-content');
+                if (target.classList.contains('assistant-message')) {
+                    contentDiv.innerHTML = renderMarkdown(content);
                 } else {
-                    alert('Failed to clear chat history. Please try again.');
+                    contentDiv.textContent = content;
                 }
+            }
+        }
+
+        function handleKeyPress(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        }
+
+        function sendPredefinedQuestion(question) {
+            input.value = question;
+            sendMessage();
+        }
+
+        function sendMessage() {
+            const message = input.value.trim();
+            if (!message) return;
+
+            input.disabled = true;
+            document.querySelector('#send-btn').disabled = true;
+            input.value = '';
+            appendMessage('user', message);
+
+            const tempId = Date.now();
+            appendMessage('assistant', '▌', tempId);
+
+            const formData = new FormData();
+            formData.append('message', message);
+            if (chatId) formData.append('chat_id', chatId);
+
+            fetch('/send_message', {
+                method: 'POST',
+                body: formData
+            }).then(response => {
+                const reader = response.body.getReader();
+                let assistantContent = '';
+                const decoder = new TextDecoder();
+
+                function push() {
+                    return reader.read().then(({ done, value }) => {
+                        if (done) {
+                            updateMessage(tempId, assistantContent);
+                            return;
+                        }
+
+                        const chunk = decoder.decode(value);
+                        const lines = chunk.split('\n');
+                        for (const line of lines) {
+                            try {
+                                const data = JSON.parse(line.trim());
+                                switch (data.event) {
+                                    case 'message':
+                                        assistantContent += data.data;
+                                        updateMessage(tempId, assistantContent + '▌');
+                                        break;
+                                    case 'chat_id':
+                                        chatId = data.data;
+                                        addChatToSidebar(chatId, message);
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            } catch (error) {
+                                continue
+                            }
+                        }
+
+                        chatBox.scrollTop = chatBox.scrollHeight;
+
+                        return push();
+                    });
+                }
+
+                return push();
             }).catch(error => {
                 console.error('Error:', error);
-                alert('An error occurred. Please try again later.');
+                updateMessage(tempId, '⚠️ Something went wrong. Please try again later.');
+            }).finally(() => {
+                input.disabled = false;
+                document.querySelector('#send-btn').disabled = false;
+                input.focus();
             });
+        }
+
+        function addChatToSidebar(id, firstMessage) {
+            const sidebar = document.querySelector('.chat-list');
+
+            const emptyHistory = sidebar.querySelector('.empty-history');
+            if (emptyHistory) {
+                sidebar.removeChild(emptyHistory);
+            }
+
+            const div = document.createElement('div');
+            div.className = 'chat-item';
+            div.innerHTML = 
+                <div class="chat-preview">${firstMessage.substring(0, 32)}${firstMessage.length > 32 ? '...' : ''}</div>
+                <small class="chat-time">Just now</small>
+            ;
+            div.onclick = () => loadChat(id);
+            sidebar.insertBefore(div, sidebar.firstChild);
+        }
+
+        function loadChat(chatId) {
+            window.location.href = /ai_chatbot?chat_id=${chatId};
+        }
+
+        function newChat() {
+            window.location.href = "/new_chat";
+        }
+
+        function toggleSidebar() {
+            document.querySelector('.history-sidebar').classList.toggle('active');
         }
     </script>
 </body>
