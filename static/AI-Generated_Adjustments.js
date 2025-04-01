@@ -25,13 +25,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
             const result = await response.json();
 
-            recommendationDiv.innerHTML = `
-                <h3>AI Recommendations</h3>
-                <p><strong>Investment Strategy:</strong> ${result.investment_strategy}</p>
-                <p><strong>Optimal Savings Plan:</strong> ${result.savings_plan}</p>
-                <p><strong>Debt Repayment Strategy:</strong> ${result.debt_strategy}</p>
-                <p><strong>Projected Growth:</strong> SGD ${result.projected_growth}</p>
-            `;
+            // Handling response data and rendering the results
+            if (result.error) {
+                recommendationDiv.innerHTML = `<p style="color:red;">${result.error}</p>`;
+            } else {
+                recommendationDiv.innerHTML = `
+                    <h3>AI Recommendations</h3>
+                    <p><strong>Investment Strategy:</strong> ${result.investment_strategy}</p>
+                    <p><strong>Optimal Savings Plan:</strong> ${result.savings_plan}</p>
+                    <p><strong>Debt Repayment Strategy:</strong> ${result.debt_strategy}</p>
+                    <p><strong>Projected Growth:</strong> SGD ${result.projected_growth}</p>
+                `;
+            }
         } catch (error) {
             recommendationDiv.innerHTML = `<p style="color:red;">Error fetching recommendations. Try again.</p>`;
             console.error("Fetch error:", error);

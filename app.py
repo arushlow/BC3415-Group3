@@ -208,15 +208,16 @@ def ai_generated_adjustments():
 
             # Extract values safely
             try:
-                income = int(data.get("income", 0))
-                expenses = int(data.get("expenses", 0))
-                savings = int(data.get("savings", 0))
-                investments = int(data.get("investments", 0))
-                debt = int(data.get("debt", 0))
+                income = float(data.get("income", 0))
+                expenses = float(data.get("expenses", 0))
+                savings = float(data.get("savings", 0))
+                investments = float(data.get("investments", 0))
+                debt = float(data.get("debt", 0))
             except ValueError as ve:
                 logging.error(f"Invalid numeric values: {ve}")
                 return jsonify({"error": "Invalid numeric values provided"}), 400
 
+            # Risk Tolerance Mapping
             risk_tolerance = data.get("risk_tolerance", "medium")
             risk_mapping = {
                 "low": "Increase bond allocation, minimize high-risk assets",
@@ -224,14 +225,28 @@ def ai_generated_adjustments():
                 "high": "Higher stock allocation, potential for crypto or startups"
             }
             investment_strategy = risk_mapping.get(risk_tolerance, "Balanced portfolio")
-            
-            savings_suggestion = income * 0.2 if expenses < income else "Reduce expenses to save more"
-            debt_strategy = "Prioritize high-interest debt first" if debt > 0 else "No major debts, focus on investments"
+
+            # Savings Strategy based on income and expenses
+            suggested_savings_percentage = 0.20  # Default 20% of income should be saved
+            if expenses > income:
+                savings_suggestion = "Reduce expenses to save more"
+            else:
+                savings_suggestion = f"Save at least {income * suggested_savings_percentage} SGD per month"
+
+            # Debt Repayment Strategy: Prioritize high-interest debts
+            debt_strategy = ""
+            if debt > 0:
+                # Assuming user has a list of debts and their interest rates, prioritize high-interest debt
+                debt_strategy = "Prioritize paying off high-interest debt first."
+            else:
+                debt_strategy = "No major debts, focus on building investments."
+
+            # Projected Growth Estimate: Assume a 5% return rate on investments and savings
             projected_growth = round((investments + savings) * 0.05, 2)
 
             response = {
                 "investment_strategy": investment_strategy,
-                "savings_plan": f"Save at least {savings_suggestion} per month",
+                "savings_plan": savings_suggestion,
                 "debt_strategy": debt_strategy,
                 "projected_growth": projected_growth
             }
@@ -243,6 +258,7 @@ def ai_generated_adjustments():
             return jsonify({"error": "An error occurred while processing your request."}), 500
 
     return render_template("ai_generated_adjustments.html")
+
 
 
 
