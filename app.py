@@ -328,8 +328,8 @@ app = Flask(__name__)
 def home():
     return render_template("ai_generated_adjustments.html")
 
-@app.route('/ai-adjustments', methods=['POST'])
-def ai_adjustments():
+@app.route('/ai_generated_adjustments', methods=['POST'])
+def /ai_generated_adjustments():
     data = request.get_json()
 
     # Extract user financial data
@@ -366,6 +366,3 @@ def ai_adjustments():
     }
 
     return jsonify(response)
-
-if __name__ == "__main__":
-    app.run(debug=True)

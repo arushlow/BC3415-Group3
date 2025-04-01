@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", function () {
         };
 
         try {
-            const response = await fetch("/ai-adjustments", {
+            const response = await fetch("//ai_generated_adjustments", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(formData)
