@@ -214,7 +214,7 @@ def ai_generated_adjustments():
                 debt = int(data.get("debt", 0))
             except ValueError as ve:
                 logging.error(f"Invalid numeric values: {ve}")
-                return jsonify({"error": "Invalid numeric values"}), 400
+                return jsonify({"error": "Invalid numeric values provided"}), 400
 
             risk_tolerance = data.get("risk_tolerance", "medium")
             risk_mapping = {
@@ -242,6 +242,7 @@ def ai_generated_adjustments():
             return jsonify({"error": "An error occurred while processing your request."}), 500
 
     return render_template("ai_generated_adjustments.html")
+
 
 
 @app.route("/send_message", methods=["POST"])
