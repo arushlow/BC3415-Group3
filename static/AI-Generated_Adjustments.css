@@ -1,17 +1,11 @@
 /* General Page Styling */
-header {
-    background-color: #0066b2;
-    color: white;
-    text-align: center;
-    padding: 2rem 1rem;
-    margin-bottom: 2rem;
-}
-
 body {
-    font-family: "Arial", sans-serif;
-    background-color: #f4f4f9;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
     margin: 0;
     padding: 0;
+    background-color: #f4f7fc;
+    color: #333;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -19,79 +13,102 @@ body {
     min-height: 100vh;
 }
 
-/* Heading */
-h1 {
-    color: #333;
+/* Header */
+.header-box {
+    background: #0066b2;
+    color: white;
     text-align: center;
-    margin-bottom: 20px;
+    padding: 1.5rem;
+    width: 90%;
+    max-width: 500px;
+    font-size: 1.8rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    border-radius: 8px 8px 0 0;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Container */
+.container {
+    width: 90%;
+    max-width: 500px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    padding: 2rem;
 }
 
 /* Form Styling */
 form {
-    background: white;
-    padding: 20px;
-    width: 90%;
-    max-width: 450px;
-    border-radius: 8px;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
 }
 
 /* Input Fields */
 .input-group {
-    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
 }
 
 label {
-    font-size: 14px;
-    font-weight: bold;
-    color: #333;
-    display: block;
-    margin-bottom: 5px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #555;
 }
 
 input, select {
-    width: 100%;
-    padding: 10px;
-    border-radius: 5px;
+    padding: 0.75rem;
     border: 1px solid #ccc;
-    font-size: 14px;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease-in-out;
+}
+
+input:focus, select:focus {
+    border-color: #0066b2;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0, 102, 178, 0.2);
 }
 
 /* Submit Button */
 .cta-button {
     width: 100%;
-    background: #007bff;
+    padding: 0.75rem 1.5rem;
+    background-color: #0066b2;
     color: white;
     border: none;
-    padding: 12px;
-    font-size: 16px;
-    border-radius: 5px;
+    border-radius: 4px;
+    font-size: 1rem;
     cursor: pointer;
-    transition: background 0.3s ease-in-out;
+    transition: background-color 0.2s, transform 0.2s;
 }
 
 .cta-button:hover {
-    background: #0056b3;
+    background-color: #0055a4;
+    transform: scale(1.03);
 }
 
-/* Recommendation Box */
+/* Recommendation Summary */
 #recommendation-summary {
-    margin-top: 20px;
-    padding: 15px;
+    margin-top: 1.5rem;
+    padding: 1rem;
     background: #e9f7ef;
-    border-left: 5px solid #28a745;
-    width: 90%;
-    max-width: 450px;
-    font-size: 14px;
+    border-left: 4px solid #28a745;
+    width: 100%;
+    font-size: 1rem;
     line-height: 1.6;
     box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
 }
 
 /* Responsive Design */
 @media (max-width: 600px) {
-    form, #recommendation-summary {
+    .container, .header-box {
         width: 100%;
         max-width: 100%;
-        padding: 15px;
+        border-radius: 0;
     }
 }
