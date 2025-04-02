@@ -767,6 +767,28 @@ button.cta-button:hover {
     margin: 0;
 }
 
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    text-align: center;
+}
+
+header {
+    width: 100%;
+    background-color: #007BFF;
+    color: white;
+    padding: 20px 0;
+    text-align: center;
+    font-size: 2em;
+    font-weight: bold;
+}
+
 .cta-buttons {
     display: flex;
     flex-direction: column;
@@ -790,3 +812,4 @@ button.cta-button:hover {
 .cta-button:hover {
     background-color: #0056b3;
 }
+
