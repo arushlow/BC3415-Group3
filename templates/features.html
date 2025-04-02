@@ -7,17 +7,13 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    <div class="container">
-        <h1 class="title">Features</h1>
-        <h2 class="subtitle">Key Features:</h2>
-        <div class="cta-buttons">
-            <a href="{{ url_for('scenario_simulation') }}" class="cta-button">Scenario Simulation</a>
-            <a href="{{ url_for('ai_generated_adjustments') }}" class="cta-button">AI-Generated Adjustments</a>
-            <a href="{{ url_for('ai_chatbot') }}" class="cta-button">AI Chatbot</a>
-        </div>
-        <div class="footer">
-            <a href="{{ url_for('home') }}" class="cta-button back-button">Back to Homepage</a>
-        </div>
+    <h1>Features</h1>
+    <h2>Key Features:</h2>
+    <div class="cta-buttons">
+        <a href="{{ url_for('scenario_simulation') }}" class="cta-button">Scenario Simulation</a>
+        <a href="{{ url_for('ai_generated_adjustments') }}" class="cta-button">AI-Generated Adjustments</a>
+        <a href="{{ url_for('ai_chatbot') }}" class="cta-button">AI Chatbot</a>
     </div>
+    <a href="{{ url_for('home') }}" class="cta-button">Back to Homepage</a>
 </body>
 </html>
