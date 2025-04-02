@@ -779,21 +779,16 @@ body {
     text-align: center;
 }
 
-/* Header */
-h1 {
-    background-color: #007BFF;
+header {
+    background-color: #007BFF; /* Blue color */
     color: white;
-    padding: 2rem 1rem;
-    margin-bottom: 2rem;
-    font-size: 2.2rem;
+    padding: 15px;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
     width: 100%;
-}
-
-/* Subheading */
-h2 {
-    font-size: 1.6rem;
-    margin-bottom: 1.5rem;
-    color: #555;
+    box-sizing: border-box;
 }
 
 .cta-buttons {
