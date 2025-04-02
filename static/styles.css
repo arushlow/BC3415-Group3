@@ -783,7 +783,7 @@ body {
 h1 {
     background-color: #007BFF;
     color: white;
-    padding: 15px;
+    padding: 0px;
     text-align: center;
     position: sticky;
     top: 0;
@@ -791,7 +791,6 @@ h1 {
     width: 100%;
     box-sizing: border-box;
 }
-
 
 /* Subheading */
 h2 {
