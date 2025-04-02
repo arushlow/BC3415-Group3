@@ -767,49 +767,85 @@ button.cta-button:hover {
     margin: 0;
 }
 
+/* General Page Styling */
 body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f7fc;
+    color: #333;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     height: 100vh;
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
     text-align: center;
 }
 
-header {
-    width: 100%;
+/* Header */
+h1 {
     background-color: #007BFF;
     color: white;
-    padding: 20px 0;
-    text-align: center;
-    font-size: 2em;
-    font-weight: bold;
+    padding: 2rem 1rem;
+    margin-bottom: 2rem;
+    font-size: 2.2rem;
+    width: 100%;
 }
 
+/* Subheading */
+h2 {
+    font-size: 1.6rem;
+    margin-bottom: 1.5rem;
+    color: #555;
+}
+
+/* CTA Buttons Section */
 .cta-buttons {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 15px; /* Adds space between buttons */
+    gap: 15px;
+    width: 100%;
+    max-width: 400px;
+    margin-bottom: 2rem;
 }
 
+/* CTA Buttons */
 .cta-button {
-    display: block;
-    width: 200px; /* Set a fixed width for better alignment */
-    text-align: center;
-    padding: 12px 20px;
+    width: 100%;
+    padding: 0.75rem;
     background-color: #007BFF;
     color: white;
-    border-radius: 8px;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.2s;
     text-decoration: none;
-    font-size: 1.2em;
-    transition: background 0.3s ease;
+    text-align: center;
 }
 
 .cta-button:hover {
-    background-color: #0056b3;
+    background-color: #0055a4;
+    transform: scale(1.03);
 }
 
+/* Back Button */
+a.cta-button {
+    background-color: #6c757d;
+}
+
+a.cta-button:hover {
+    background-color: #5a6268;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 1.8rem;
+    }
+    .cta-button {
+        font-size: 0.9rem;
+    }
+}
