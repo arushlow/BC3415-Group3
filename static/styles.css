@@ -779,14 +779,21 @@ body {
     text-align: center;
 }
 
-header {
-    width: 100%;
+/* Header */
+h1 {
     background-color: #007BFF;
-    color: #007BFF;
-    padding: 20px 0;
-    text-align: center;
-    font-size: 2em;
-    font-weight: bold;
+    color: white;
+    padding: 2rem 1rem;
+    margin-bottom: 2rem;
+    font-size: 2.2rem;
+    width: 100%;
+}
+
+/* Subheading */
+h2 {
+    font-size: 1.6rem;
+    margin-bottom: 1.5rem;
+    color: #555;
 }
 
 .cta-buttons {
@@ -813,3 +820,10 @@ header {
     background-color: #0056b3;
 }
 
+footer {
+    text-align: center;
+    padding: 10px;
+    background-color: #333;
+    color: white;
+    margin-top: auto;
+}
