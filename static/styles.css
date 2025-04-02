@@ -783,7 +783,7 @@ body {
 h1 {
     background-color: #007BFF;
     color: white;
-    padding: 15px;
+    padding: 0px;
     text-align: center;
     position: sticky;
     top: -20;
