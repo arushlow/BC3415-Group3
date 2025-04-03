@@ -11,13 +11,32 @@
     <h1>Dashboard</h1>
 
     <h2>Bank Account Balances Chart</h2>
-
-    {% if message %}
-    <p>{{ message }}</p>
-    {% else %}
+    
     <!-- Display the graph -->
-    <img src="{{ url_for('view_invest') }}" alt="Account Balance Chart">
-    {% endif %}
+    <img src="{{ url_for('view_overview') }}?{{ timestamp1 }}" alt="Account Balance Chart">
+    
+    <table>
+        <tr>
+            <td>Account Overview</td>
+        </tr>
+        <tr>
+            <td>Bank Name</td>
+            <td>Account Type</td>
+            <td>Balance</td>
+        </tr>
+        {% for bank in overview %}
+        <tr>
+            <td>{{bank.bank_name}}</td>
+            <td>{{bank.account_type}}</td>
+            <td>{{bank.balance}}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+
+    <!-- Display the graph -->
+    <img src="{{ url_for('view_invest') }}?{{ timestamp2 }}" alt="Investment Balance Chart">
+
 
     <table>
         <tr>

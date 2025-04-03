@@ -5,8 +5,9 @@ from io import StringIO, BytesIO
 import uuid
 import csv
 from functools import wraps
-from decimal import Decimal
+import numpy as np
 import matplotlib.pyplot as plt
+
 
 from dotenv import load_dotenv
 from flask import Flask, Response, redirect, render_template, request, session, url_for, jsonify
@@ -321,6 +322,9 @@ def home():
 @app.route("/dashboard")
 def dashboard():
     data_invest = DataInvestment.select().where(DataInvestment.user == session['username'])
+    data_overview = DataOverview.select().where(DataOverview.user == session['username'])
+    timestamp1 = np.random.randint(1, 1000000)
+    timestamp2 = np.random.randint(1, 1000000)
     invest_totals = {
         "Bonds": 0,
         "ETF": 0,
@@ -330,91 +334,54 @@ def dashboard():
     for invest in data_invest:
         invest_totals[invest.invest_type] += invest.amount
     
-    return render_template("dashboard.html", investment=data_invest, invest_totals=invest_totals)
+    return render_template("dashboard.html", investment=data_invest, invest_totals=invest_totals, overview=data_overview,timestamp1=timestamp1,timestamp2=timestamp2)
 
 @app.route("/view_overview")
 def view_overview():
-    # Fetch data for the user
     overview = DataOverview.select().where(DataOverview.user == session["username"])
 
-    # Initialize the dictionary to store bank account data
-    bank_accounts = {}
+    fig, ax = plt.subplots(figsize=(10, 6))
+    
+    bank_accounts={}
+    for account in overview:
+        if account.bank_name not in bank_accounts:
+            bank_accounts[account.bank_name] = {}
+            
+        bank_accounts[account.bank_name][account.account_type] = account.balance
 
-    # Collect the data for each bank and account type
-    for data in overview:
-        bank_name = data.bank_name
-        account_type = data.account_type
-        balance = data.balance  # balance is likely a Decimal, so we need to ensure correct handling
-        
-        # If bank_name doesn't exist in the dictionary, create a new entry
-        if bank_name not in bank_accounts:
-            bank_accounts[bank_name] = {}
 
-        bank_accounts[bank_name][account_type] = balance
-
-    # Create a list of bank names
-    bank_names = list(bank_accounts.keys())
-
-    # Create a dictionary to hold account types for each bank
-    account_types = {bank: sorted(account_type_dict.keys()) for bank, account_type_dict in bank_accounts.items()}
-
-    # Create a dictionary to hold balances for each bank, grouped by account type
-    balances = {bank: {account_type: Decimal(0) for account_type in account_types[bank]} for bank in bank_names}
-
-    # Populate balances with the correct data
-    for bank_name, account_type_dict in bank_accounts.items():
-        for account_type, balance in account_type_dict.items():
-            balances[bank_name][account_type] = balance
-
-    # Generate the plot
-    plt.figure(figsize=(12, 6))
-
-    # Define the colors for the bars
-    colors = plt.cm.Paired(range(len(account_types)))
-
-    # Initialize bottom values for stacking the bars
-    bottom_values = [0] * len(bank_names)
-
-    # Loop over each account type to plot the stacked bars
-    for i, account_type in enumerate(account_types):
-        # Get the balances for the current account type across all banks
-        account_type_balances = [
-            float(balances[bank].get(account_type, Decimal(0))) for bank in bank_names]  # Convert Decimal to float
-        
-        # Plot the bar for the current account type
-        plt.bar(bank_names, account_type_balances, bottom=bottom_values, label=account_type, color=colors[i])
-        
-        # Update the bottom values for the next stacked bar
-        bottom_values = [bottom + current for bottom, current in zip(bottom_values, account_type_balances)]
-
-    # Add bank total balance to the x-axis label
-    bank_labels = []
-    for i, bank_name in enumerate(bank_names):
-        # Calculate the total balance for the bank
-        total_balance = sum([float(balances[bank_name].get(account_type, Decimal(0))) for account_type in account_types[bank_name]])  # Convert Decimal to float
-        bank_labels.append(f'{bank_name}\n({total_balance:.2f})')
-
-    # Set x-axis labels with bank names and total balance
-    plt.xticks(ticks=range(len(bank_names)), labels=bank_labels, rotation=45, ha='right')
-
-    # Label the axes and the title
-    plt.xlabel('Bank Name')
-    plt.ylabel('Balance')
-    plt.title('Bank Account Balances by Account Type')
-
-    # Adjust the layout to fit the labels
-    plt.tight_layout()
-
-    # Display the legend for the account types
-    plt.legend(title='Account Type')
-
-    # Save the plot to a BytesIO object to avoid saving it to a file
+    index = np.arange(len(bank_accounts))
+    bottom = np.zeros(len(bank_accounts))
+    
+    for i, (bank, data) in enumerate(bank_accounts.items()):
+        for j, (account, balance) in enumerate(data.items()):
+            ax.bar(index[i], balance, 0.8, bottom=bottom[i], label=f'{bank} Account', color=np.random.rand(3,))
+            bottom[i] += float(balance)
+            ax.text(
+                index[i],
+                bottom[i] - float(balance) / 2,
+                f'{account}',
+                ha='center',
+                va='center',
+                color='white',
+                fontweight='bold'
+            )
+            
+    ax.set_ylabel('Total Balance')
+    ax.set_title('Bank Account Balances Stacked by Bank')
+    ax.set_xticks(index)
+    ax.set_xticklabels(list(bank_accounts.keys()))
+    
     img = BytesIO()
     plt.savefig(img, format='png')
-    img.seek(0)  # Rewind the buffer to the beginning
+    img.seek(0)
 
-    # Return the image as a response
-    return Response(img, mimetype='image/png')
+    response = Response(img, mimetype='image/png')
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    
+    return response
 
 @app.route("/view_invest")
 def view_invest():
@@ -435,8 +402,13 @@ def view_invest():
     img = BytesIO()
     plt.savefig(img, format='png')
     img.seek(0)
-        
-    return Response(img, mimetype='image/png')
+
+    response = Response(img, mimetype='image/png')
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    
+    return response
 
 @app.route("/data")
 def data():
