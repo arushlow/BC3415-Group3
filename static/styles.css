@@ -74,6 +74,27 @@ body {
     border-radius: 50%;
 }
 
+.sidebar-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+#clear-history-btn {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px;
+}
+
+#clear-history-btn:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+}
+
 .chat-list {
     overflow-y: auto;
     flex-grow: 1;

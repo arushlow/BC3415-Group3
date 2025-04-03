@@ -380,6 +380,21 @@ def ai_chatbot():
     return render_template("ai_chatbot.html", chats=chats, history=history)
 
 
+@app.route("/clear_chat_history", methods=["POST"])
+@login_required
+def clear_chat_history():
+    try:
+        username = session["username"]
+        with database.atomic():
+            deleted_count = ChatHistory.delete().where(
+                ChatHistory.user == username
+            ).execute()
+        
+        return jsonify({"success": True, "message": f"Deleted {deleted_count} messages"}), 200
+    except Exception as e:
+        logging.error(f"Error clearing chat history: {e}", exc_info=True)
+        return jsonify({"success": False, "error": str(e)}), 500
+
 
 @app.route("/homepage")
 def home():
