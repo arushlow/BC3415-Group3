@@ -27,7 +27,7 @@
         {% for bank in overview %}
         <tr>
             <td>{{bank.bank_name}}</td>
-            <td>{{bank.account_type}}</td>
+            <td><a href="{{ url_for('account_details', account_id=bank.account_id) }}">{{bank.account_type}}</a></td>
             <td>{{bank.balance}}</td>
         </tr>
         {% endfor %}

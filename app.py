@@ -410,6 +410,12 @@ def view_invest():
     
     return response
 
+@app.route("/account/<int:account_id>")
+def account_details(account_id):
+    account = DataTransaction.select().where((DataTransaction.user == session["username"]) & (DataTransaction.bank_account_id == account_id))
+    return render_template("account_info.html", account=account)
+
+
 @app.route("/data")
 def data():
     return render_template("data.html")
