@@ -1,28 +1,78 @@
-from datetime import datetime
+import asyncio
+import atexit
 import json
 import logging
 import os
+import threading
 import uuid
+from datetime import datetime
 from functools import wraps
 
 from dotenv import load_dotenv
-from flask import Flask, Response, redirect, render_template, request, session, url_for, jsonify
+from flask import (
+    Flask,
+    Response,
+    jsonify,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
 from flask_bcrypt import Bcrypt
 from openai import OpenAI
 from peewee import IntegrityError
 
+from mcp_server.client import MCPClient
 from model import ChatHistory, User, create_tables, database
 from simulation import simulate_retirement
 
 create_tables()
 load_dotenv()
 client = OpenAI(
-    base_url="https://openrouter.ai/api/v1", api_key=os.getenv("OPENROUTER_API_KEY")
+    base_url="https://openrouter.ai/api/v1",
+    api_key=os.getenv("OPENROUTER_API_KEY")
 )
+
+mcp_client = MCPClient()
+mcp_client.start_background_loop()
+
+def init_mcp_client():
+    try:
+        mcp_client.run_in_background(mcp_client.connect_to_server({
+            "command": "python",
+            "args": ["mcp_server/finance.py"],
+            "cwd": os.path.dirname(__file__),
+            "env": None
+        }))
+        print("MCP client initialized successfully")
+    except Exception as e:
+        print(f"Failed to initialize MCP client: {e}")
+
+threading.Timer(1.0, init_mcp_client).start()
+
+@atexit.register
+def cleanup_resources():
+    if mcp_client:
+        print("Cleaning up MCP client...")
+        try:
+            def cleanup_background():
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+                loop.run_until_complete(mcp_client.cleanup_session())
+                loop.close()
+            
+            cleanup_thread = threading.Thread(target=cleanup_background)
+            cleanup_thread.start()
+            cleanup_thread.join(timeout=5.0)
+            
+            mcp_client.stop_background_loop()
+        except Exception as e:
+            print(f"Error during cleanup: {e}")
+
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY")
 bcrypt = Bcrypt(app)
-
 
 def login_required(f):
     @wraps(f)
@@ -32,6 +82,22 @@ def login_required(f):
         return f(*args, **kwargs)
 
     return inner
+
+
+def convert_tool_format(tool):
+    converted_tool = {
+        "type": "function",
+        "function": {
+            "name": tool.name,
+            "description": tool.description,
+            "parameters": {
+                "type": "object",
+                "properties": tool.inputSchema["properties"],
+                "required": tool.inputSchema["required"]
+            }
+        }
+    }
+    return converted_tool
 
 
 @app.route("/")
@@ -298,15 +364,15 @@ def send_message():
     else:
         chat_title = history[0].chat_title
 
-    ChatHistory.create(
-        user=username,
-        chat_id=chat_id,
-        chat_title=chat_title,
-        message=json.dumps({"role": "user", "content": message}),
-        created_at=datetime.now(),
-    )
     history = [json.loads(h.message) for h in history]
     history.append({"role": "user", "content": message})
+
+    try:
+        response = mcp_client.list_tools()
+        available_tools = [convert_tool_format(tool) for tool in response.tools]
+    except Exception as e:
+        print(f"Error getting tools: {e}")
+        available_tools = []
 
     def generate():
         if is_new_chat_id:
@@ -314,27 +380,208 @@ def send_message():
 
         stream = client.chat.completions.create(
             extra_body={},
-            model="deepseek/deepseek-chat-v3-0324:free",
+            model="google/gemini-2.5-pro-exp-03-25:free",
             messages=history,
+            tools=available_tools,
             stream=True,
         )
 
         assistant_response = ""
-        for chunk in stream:
-            content = chunk.choices[0].delta.content or ""
-            assistant_response += content
-            yield json.dumps({"event": "message", "data": content}) + "\n"
+        tool_call_ids = []
+        tool_call_parts = {}
 
-        ChatHistory.create(
-            user=username,
-            chat_id=chat_id,
-            chat_title=chat_title,
-            message=json.dumps({"role": "assistant", "content": assistant_response}),
-            created_at=datetime.now(),
-        )
+        for chunk in stream:
+            if chunk.choices[0].delta.tool_calls:
+                tool_calls = chunk.choices[0].delta.tool_calls
+                for tool_call in tool_calls:
+                    tool_call_id = tool_call.id
+                    
+                    if tool_call_id not in tool_call_parts:
+                        tool_call_ids.append(tool_call_id)
+                        tool_call_parts[tool_call_id] = {
+                            "name": "",
+                            "arguments": "",
+                            "complete": False
+                        }
+                        yield json.dumps({"event": "tool_call_start", "data": tool_call_id}) + "\n"
+                    
+                    if tool_call.function.name:
+                        tool_call_parts[tool_call_id]["name"] += tool_call.function.name
+                        yield json.dumps({
+                            "event": "tool_call_update", 
+                            "data": {
+                                "id": tool_call_id,
+                                "type": "name",
+                                "content": tool_call.function.name
+                            }
+                        }) + "\n"
+                    
+                    if tool_call.function.arguments:
+                        tool_call_parts[tool_call_id]["arguments"] += tool_call.function.arguments
+                        yield json.dumps({
+                            "event": "tool_call_update", 
+                            "data": {
+                                "id": tool_call_id,
+                                "type": "arguments",
+                                "content": tool_call.function.arguments
+                            }
+                        }) + "\n"
+                        
+                        args_str = tool_call_parts[tool_call_id]["arguments"].strip()
+                        if args_str.endswith("}"):
+                            try:
+                                json.loads(args_str)
+                                tool_call_parts[tool_call_id]["complete"] = True
+                            except json.JSONDecodeError:
+                                pass
+
+            content = chunk.choices[0].delta.content or ""
+            if content:
+                assistant_response += content
+                yield json.dumps({"event": "message", "data": content}) + "\n"
+
+        if assistant_response:
+            ChatHistory.create(
+                user=username,
+                chat_id=chat_id,
+                chat_title=chat_title,
+                message=json.dumps({"role": "user", "content": message}),
+                created_at=datetime.now(),
+            )
+
+            ChatHistory.create(
+                user=username,
+                chat_id=chat_id,
+                chat_title=chat_title,
+                message=json.dumps({"role": "assistant", "content": assistant_response}),
+                created_at=datetime.now(),
+            )
+
+        for tool_id in tool_call_ids:
+            tool_name = tool_call_parts[tool_id]["name"]
+            tool_args_str = tool_call_parts[tool_id]["arguments"]
+            
+            try:
+                tool_args = json.loads(tool_args_str)
+                
+                try:
+                    tool_result = mcp_client.call_tool(tool_name, tool_args)
+                    
+                    yield json.dumps({
+                        "event": "tool_result", 
+                        "data": {
+                            "id": tool_id,
+                            "result": tool_result.content[0].text
+                        }
+                    }) + "\n"
+                    
+                    tool_call_message = {
+                        "role": "assistant",
+                        "content": None,
+                        "tool_calls": [
+                            {
+                                "id": tool_id,
+                                "type": "function",
+                                "function": {
+                                    "name": tool_name,
+                                    "arguments": tool_args_str
+                                }
+                            }
+                        ]
+                    }
+                    
+                    tool_result_message = {
+                        "role": "tool",
+                        "tool_call_id": tool_id,
+                        "content": tool_result.content[0].text
+                    }
+
+                except Exception as e:
+                    error_message = f"Error calling tool: {str(e)}"
+                    print(f"Error calling tool {tool_name}: {e}")
+                    
+                    yield json.dumps({
+                        "event": "tool_result", 
+                        "data": {
+                            "id": tool_id,
+                            "error": error_message
+                        }
+                    }) + "\n"
+                    
+                    tool_call_message = {
+                        "role": "assistant",
+                        "content": None,
+                        "tool_calls": [
+                            {
+                                "id": tool_id,
+                                "type": "function",
+                                "function": {
+                                    "name": tool_name,
+                                    "arguments": tool_args_str
+                                }
+                            }
+                        ]
+                    }
+                    
+                    tool_result_message = {
+                        "role": "tool",
+                        "tool_call_id": tool_id,
+                        "content": json.dumps({"error": error_message})
+                    }
+                    
+            except json.JSONDecodeError as je:
+                error_message = f"Invalid tool arguments: {str(je)}"
+                print(f"Invalid tool arguments for {tool_name}: {je}")
+                
+                yield json.dumps({
+                    "event": "tool_result", 
+                    "data": {
+                        "id": tool_id,
+                        "error": error_message
+                    }
+                }) + "\n"
+                
+                tool_call_message = {
+                    "role": "assistant",
+                    "content": None,
+                    "tool_calls": [
+                        {
+                            "id": tool_id,
+                            "type": "function",
+                            "function": {
+                                "name": tool_name,
+                                "arguments": tool_args_str
+                            }
+                        }
+                    ]
+                }
+                
+                tool_result_message = {
+                    "role": "tool",
+                    "tool_call_id": tool_id,
+                    "content": json.dumps({"error": error_message})
+                }
+
+            ChatHistory.create(
+                user=username,
+                chat_id=chat_id,
+                chat_title=chat_title,
+                message=json.dumps(tool_call_message),
+                created_at=datetime.now(),
+            )
+
+            ChatHistory.create(
+                user=username,
+                chat_id=chat_id,
+                chat_title=chat_title,
+                message=json.dumps(tool_result_message),
+                created_at=datetime.now(),
+            )
+            
+            history.append(tool_call_message)
+            history.append(tool_result_message)
 
     return Response(generate(), mimetype="text/event-stream")
-
 
 @app.route("/new_chat")
 @login_required
@@ -373,12 +620,27 @@ def ai_chatbot():
         if not messages:
             return redirect(url_for("ai_chatbot"))
 
-        history = [json.loads(msg.message) for msg in messages]
+        history = []
+        for msg in messages:
+            msg_data = json.loads(msg.message)
+            
+            if msg_data.get('role') == 'tool':
+                try:
+                    content = msg_data.get('content', '')
+                    if isinstance(content, str):
+                        try:
+                            content_obj = json.loads(content)
+                            msg_data['content'] = json.dumps(content_obj)
+                        except json.JSONDecodeError:
+                            pass
+                except Exception as e:
+                    print(f"Error processing tool result: {e}")
+            
+            history.append(msg_data)
     else:
         history = []
 
     return render_template("ai_chatbot.html", chats=chats, history=history)
-
 
 @app.route("/clear_chat_history", methods=["POST"])
 @login_required

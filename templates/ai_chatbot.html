@@ -69,9 +69,70 @@
                     <div id="chatbox" class="{% if not history %}empty{% endif %}">
                         {% if history %}
                         {% for msg in history %}
+                        {% if msg.role == 'assistant' and msg.tool_calls %}
+                        <div class="message assistant-message">
+                            <div class="message-content">
+                                {% for tool_call in msg.tool_calls %}
+                                <div class="tool-call-container" id="tool-call-{{ tool_call.id }}">
+                                    <div class="tool-call-header">
+                                        <span class="tool-icon">🛠️</span>
+                                        <span class="tool-name">{{ tool_call.function.name }}</span>
+                                    </div>
+                                    <div class="tool-call-args">
+                                        <pre>{{ tool_call.function.arguments }}</pre>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                                {% if msg.content %}
+                                {{ msg.content }}
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% elif msg.role == 'tool' %}
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function () {
+                                const toolCallContainer = document.getElementById('tool-call-{{ msg.tool_call_id }}');
+                                if (toolCallContainer) {
+                                    const resultDiv = document.createElement('div');
+                                    resultDiv.className = 'tool-call-result';
+                                    resultDiv.innerHTML = '<div class="tool-result-header">📊 Results:</div>';
+
+                                    const resultContent = document.createElement('pre');
+                                    resultContent.className = 'tool-result-content';
+                                    try {
+                                        const contentStr = `{{ msg.content|safe|replace("'", "\\'") }}`;
+
+                                        const cleanContent = contentStr
+                                            .replace(/\\n/g, "\\n")
+                                            .replace(/\\'/g, "\\'")
+                                            .replace(/\\"/g, '\\"')
+                                            .replace(/\\&/g, "\\&")
+                                            .replace(/\\r/g, "\\r")
+                                            .replace(/\\t/g, "\\t")
+                                            .replace(/\\b/g, "\\b")
+                                            .replace(/\\f/g, "\\f");
+
+                                        try {
+                                            const jsonObj = JSON.parse(cleanContent);
+                                            resultContent.textContent = JSON.stringify(jsonObj, null, 2);
+                                        } catch (jsonErr) {
+                                            resultContent.textContent = cleanContent;
+                                        }
+                                    } catch (e) {
+                                        console.error('Error processing tool result:', e);
+                                        resultContent.textContent = "Unable to display the result.";
+                                    }
+
+                                    resultDiv.appendChild(resultContent);
+                                    toolCallContainer.appendChild(resultDiv);
+                                }
+                            });
+                        </script>
+                        {% else %}
                         <div class="message {{ msg.role }}-message">
                             <div class="message-content">{{ msg.content }}</div>
                         </div>
+                        {% endif %}
                         {% endfor %}
                         {% else %}
                         <div id="welcome-message">
@@ -87,8 +148,8 @@
                                     How can I invest my money wisely?
                                 </button>
                                 <button class="quick-response-btn"
-                                    onclick="sendPredefinedQuestion('How to identify a good investment opportunity?')">
-                                    How to identify a good investment opportunity?
+                                    onclick="sendPredefinedQuestion('Do you think NVIDIA stock is worth buying now?')">
+                                    Do you think NVIDIA stock is worth buying now?
                                 </button>
                             </div>
                         </div>
@@ -118,6 +179,9 @@
         const input = document.getElementById('user-input');
         const urlParams = new URLSearchParams(window.location.search);
         var chatId = urlParams.get('chat_id');
+        let activeToolCalls = {};
+        let lastSentMessage = '';
+        let messageToolCalls = {};
 
         marked.setOptions({
             highlight: function (code, language) {
@@ -134,12 +198,31 @@
         document.addEventListener('DOMContentLoaded', function () {
             const messageContents = document.querySelectorAll('.message-content');
             messageContents.forEach(element => {
+                if (element.querySelector('.tool-call-container')) return;
+
                 const rawText = element.textContent;
                 element.innerHTML = renderMarkdown(rawText);
             });
 
-            html = document.querySelector("html");
-            html.scrollTop = html.scrollHeight;
+            const argsElements = document.querySelectorAll('.tool-call-args pre');
+            argsElements.forEach(element => {
+                try {
+                    const jsonText = element.textContent.trim();
+                    if (jsonText) {
+                        try {
+                            const parsedJson = JSON.parse(jsonText);
+                            const formattedJson = JSON.stringify(parsedJson, null, 2);
+                            element.textContent = formattedJson;
+                        } catch (parseError) {
+                            console.warn('Error parsing arguments:', parseError);
+                        }
+                    }
+                } catch (e) {
+                    console.error('Error formatting JSON:', e);
+                }
+            });
+
+            chatBox.scrollTop = chatBox.scrollHeight;
         });
 
         function renderMarkdown(text) {
@@ -168,6 +251,8 @@
             if (id) div.dataset.tempId = id;
             chatBox.appendChild(div);
             chatBox.scrollTop = chatBox.scrollHeight;
+
+            return contentDiv;
         }
 
         function updateMessage(id, content) {
@@ -179,6 +264,194 @@
                 } else {
                     contentDiv.textContent = content;
                 }
+            }
+        }
+
+        function createToolCallContainer(toolId, messageContentDiv) {
+            const toolDiv = document.createElement('div');
+            toolDiv.className = 'message assistant-message tool-message';
+
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+
+            const toolContainer = document.createElement('div');
+            toolContainer.className = 'tool-call-container';
+            toolContainer.id = `tool-call-${toolId}`;
+
+            const header = document.createElement('div');
+            header.className = 'tool-call-header';
+            header.innerHTML = '<span class="tool-icon">🛠️</span><span class="tool-name">Loading tool...</span>';
+
+            const argsDiv = document.createElement('div');
+            argsDiv.className = 'tool-call-args';
+            argsDiv.style.display = 'none';
+
+            const argsPre = document.createElement('pre');
+            argsPre.className = 'tool-args-content';
+            argsDiv.appendChild(argsPre);
+
+            const resultDiv = document.createElement('div');
+            resultDiv.className = 'tool-call-result';
+            resultDiv.style.display = 'none';
+
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'tool-loading';
+            loadingDiv.textContent = 'Preparing tool call...';
+
+            toolContainer.appendChild(header);
+            toolContainer.appendChild(argsDiv);
+            toolContainer.appendChild(loadingDiv);
+            toolContainer.appendChild(resultDiv);
+
+            contentDiv.appendChild(toolContainer);
+            toolDiv.appendChild(contentDiv);
+
+            const messageElement = messageContentDiv.closest('.message');
+            const messageId = messageElement.dataset.tempId;
+
+            if (!messageToolCalls[messageId]) {
+                messageToolCalls[messageId] = [];
+            }
+
+            if (messageToolCalls[messageId].length > 0) {
+                const lastToolContainer = messageToolCalls[messageId][messageToolCalls[messageId].length - 1];
+                chatBox.insertBefore(toolDiv, lastToolContainer.nextSibling);
+            } else {
+                chatBox.insertBefore(toolDiv, messageElement.nextSibling);
+            }
+
+            messageToolCalls[messageId].push(toolDiv);
+
+            messageContentDiv.dataset.hasTools = 'true';
+
+            return {
+                container: toolContainer,
+                header: header,
+                argsPre: argsPre,
+                resultDiv: resultDiv,
+                loadingDiv: loadingDiv,
+                messageElement: toolDiv
+            };
+        }
+
+        function updateToolCall(data, messageContentDiv) {
+            const { id, type, content } = data;
+
+            if (!activeToolCalls[id]) {
+                const toolElements = createToolCallContainer(id, messageContentDiv);
+                activeToolCalls[id] = {
+                    elements: toolElements,
+                    name: '',
+                    arguments: ''
+                };
+            }
+
+            const toolCall = activeToolCalls[id];
+
+            if (type === 'name') {
+                toolCall.name = content;
+                const nameElement = toolCall.elements.header.querySelector('.tool-name');
+                nameElement.textContent = content;
+            } else if (type === 'arguments') {
+                toolCall.arguments += content;
+                const argsElement = toolCall.elements.argsPre;
+                toolCall.elements.argsPre.parentElement.style.display = 'block';
+                toolCall.elements.loadingDiv.style.display = 'none';
+
+                try {
+                    if (toolCall.arguments.trim().endsWith('}')) {
+                        const formattedArgs = JSON.stringify(JSON.parse(toolCall.arguments), null, 2);
+                        argsElement.textContent = formattedArgs;
+                    } else {
+                        argsElement.textContent = toolCall.arguments;
+                    }
+                    argsElement.style.display = 'block';
+                } catch (e) {
+                    argsElement.textContent = toolCall.arguments;
+                    argsElement.style.display = 'block';
+                }
+
+                toolCall.elements.loadingDiv.textContent = 'Executing tool...';
+            }
+        }
+
+        function displayToolResult(data) {
+            const { id, result, error } = data;
+            const toolCall = activeToolCalls[id];
+
+            if (!toolCall) return;
+
+            toolCall.elements.loadingDiv.style.display = 'none';
+
+            const resultDiv = toolCall.elements.resultDiv;
+
+            if (error) {
+                resultDiv.innerHTML = '<div class="tool-result-header" style="color: #d9534f;">❌ Error:</div>';
+
+                const resultContent = document.createElement('pre');
+                resultContent.className = 'tool-result-content';
+                resultContent.style.backgroundColor = 'rgba(217, 83, 79, 0.1)';
+                resultContent.style.borderColor = 'rgba(217, 83, 79, 0.2)';
+                resultContent.textContent = typeof error === 'string' ? error : JSON.stringify(error, null, 2);
+
+                resultDiv.appendChild(resultContent);
+
+                const retryButton = document.createElement('button');
+                retryButton.className = 'retry-button';
+                retryButton.textContent = 'Retry this tool call';
+                retryButton.onclick = function () {
+                    retryLastMessage();
+                };
+                resultDiv.appendChild(retryButton);
+
+                resultDiv.style.display = 'block';
+            } else {
+                resultDiv.innerHTML = '<div class="tool-result-header">📊 Results:</div>';
+
+                const resultContent = document.createElement('pre');
+                resultContent.className = 'tool-result-content';
+
+                try {
+                    if (typeof result === 'string') {
+                        try {
+                            const jsonObject = JSON.parse(result);
+                            resultContent.textContent = JSON.stringify(jsonObject, null, 2);
+                        } catch (jsonError) {
+                            resultContent.textContent = result;
+                        }
+                    } else {
+                        resultContent.textContent = JSON.stringify(result, null, 2);
+                    }
+                } catch (e) {
+                    resultContent.textContent = result;
+                }
+
+                resultDiv.appendChild(resultContent);
+                resultDiv.style.display = 'block';
+            }
+
+            delete activeToolCalls[id];
+        }
+
+        function retryLastMessage() {
+            if (lastSentMessage) {
+
+                const retryMessages = document.querySelectorAll('.retry-message');
+                retryMessages.forEach(message => {
+                    message.remove();
+                });
+
+                const retryIndicator = document.createElement('div');
+                retryIndicator.className = 'retry-indicator';
+                retryIndicator.textContent = 'Re-send the last message...';
+                chatBox.appendChild(retryIndicator);
+                chatBox.scrollTop = chatBox.scrollHeight;
+
+                setTimeout(() => {
+                    retryIndicator.remove();
+                    input.value = lastSentMessage;
+                    sendMessage(true);
+                }, 500);
             }
         }
 
@@ -194,26 +467,66 @@
             sendMessage();
         }
 
-        function sendMessage() {
+        function sendMessage(isRetry = false) {
             const message = input.value.trim();
             if (!message) return;
+
+            lastSentMessage = message;
 
             input.disabled = true;
             document.querySelector('#send-btn').disabled = true;
             input.value = '';
-            appendMessage('user', message);
+
+            const userMsgDiv = appendMessage('user', message);
+            if (isRetry) {
+                userMsgDiv.closest('.message').classList.add('retry-message');
+            }
 
             const tempId = Date.now();
-            appendMessage('assistant', '▌', tempId);
+            const messageContentDiv = appendMessage('assistant', '▌', tempId);
+            
+            messageToolCalls[tempId] = [];
 
             const formData = new FormData();
             formData.append('message', message);
             if (chatId) formData.append('chat_id', chatId);
 
+            let fetchTimeout = setTimeout(() => {
+                updateMessage(tempId, '⚠️ Request timeout, please try again later.');
+
+                const retryButton = document.createElement('button');
+                retryButton.className = 'retry-button';
+                retryButton.textContent = 'Retry';
+                retryButton.onclick = function () {
+
+                    const target = document.querySelector(`[data-temp-id="${tempId}"]`);
+                    if (target) {
+                        target.remove();
+                    }
+                    retryLastMessage();
+                };
+
+                const target = document.querySelector(`[data-temp-id="${tempId}"]`);
+                if (target) {
+                    const contentDiv = target.querySelector('.message-content');
+                    contentDiv.appendChild(document.createElement('br'));
+                    contentDiv.appendChild(retryButton);
+                }
+
+                input.disabled = false;
+                document.querySelector('#send-btn').disabled = false;
+                input.focus();
+            }, 30000);
+
             fetch('/send_message', {
                 method: 'POST',
                 body: formData
             }).then(response => {
+                if (!response.ok) {
+                    throw new Error('Server responded with status: ' + response.status);
+                }
+
+                clearTimeout(fetchTimeout);
                 const reader = response.body.getReader();
                 let assistantContent = '';
                 const decoder = new TextDecoder();
@@ -221,46 +534,229 @@
                 function push() {
                     return reader.read().then(({ done, value }) => {
                         if (done) {
-                            updateMessage(tempId, assistantContent);
+                            if (assistantContent) {
+                                if (messageContentDiv.dataset.hasTools === 'true') {
+
+                                    const textNode = document.createTextNode(assistantContent);
+                                    messageContentDiv.appendChild(textNode);
+                                } else {
+                                    updateMessage(tempId, assistantContent);
+                                }
+                            } else if (messageContentDiv.dataset.hasTools === 'false') {
+                                updateMessage(tempId, '⚠️ Server response is empty.');
+
+                                const retryButton = document.createElement('button');
+                                retryButton.className = 'retry-button';
+                                retryButton.textContent = 'Retry';
+                                retryButton.onclick = function () {
+                                    const target = document.querySelector(`[data-temp-id="${tempId}"]`);
+                                    if (target) {
+                                        target.remove();
+                                    }
+                                    retryLastMessage();
+                                };
+
+                                const target = document.querySelector(`[data-temp-id="${tempId}"]`);
+                                if (target) {
+                                    const contentDiv = target.querySelector('.message-content');
+                                    contentDiv.appendChild(document.createElement('br'));
+                                    contentDiv.appendChild(retryButton);
+                                }
+                            }
+                            
+                            cleanupMessageToolCalls(tempId);
                             return;
                         }
 
                         const chunk = decoder.decode(value);
                         const lines = chunk.split('\n');
                         for (const line of lines) {
+                            if (!line.trim()) continue;
+
                             try {
                                 const data = JSON.parse(line.trim());
                                 switch (data.event) {
                                     case 'message':
                                         assistantContent += data.data;
-                                        updateMessage(tempId, assistantContent + '▌');
+
+                                        if (messageContentDiv.dataset.hasTools === 'true') {
+                                            messageContentDiv.innerHTML = messageContentDiv.innerHTML.replace('▌', '');
+
+                                            messageContentDiv.appendChild(document.createTextNode(data.data + '▌'));
+                                        } else {
+                                            updateMessage(tempId, assistantContent + '▌');
+                                        }
                                         break;
                                     case 'chat_id':
                                         chatId = data.data;
                                         addChatToSidebar(chatId, message);
                                         break;
+                                    case 'tool_call_start':
+                                        break;
+                                    case 'tool_call_update':
+                                        updateToolCall(data.data, messageContentDiv);
+                                        break;
+                                    case 'tool_result':
+                                        displayToolResult(data.data);
+                                        break;
+                                    case 'error':
+                                        console.error('Server error:', data.data);
+                                        if (data.data.tool_id) {
+                                            displayToolResult({
+                                                id: data.data.tool_id,
+                                                error: data.data.message || 'Tool call failed'
+                                            });
+                                        } else {
+                                            const errorMsg = `\n\n⚠️ Error: ${data.data.message || 'Unknown Error'}`;
+
+                                            if (messageContentDiv.dataset.hasTools === 'true') {
+                                                messageContentDiv.appendChild(document.createTextNode(errorMsg));
+
+                                                const retryButton = document.createElement('button');
+                                                retryButton.className = 'retry-button';
+                                                retryButton.textContent = 'Retry';
+                                                retryButton.onclick = function () {
+                                                    retryLastMessage();
+                                                };
+                                                messageContentDiv.appendChild(document.createElement('br'));
+                                                messageContentDiv.appendChild(retryButton);
+                                            } else {
+                                                assistantContent += errorMsg;
+                                                updateMessage(tempId, assistantContent);
+
+                                                const retryButton = document.createElement('button');
+                                                retryButton.className = 'retry-button';
+                                                retryButton.textContent = 'Retry';
+                                                retryButton.onclick = function () {
+                                                    const target = document.querySelector(`[data-temp-id="${tempId}"]`);
+                                                    if (target) {
+                                                        target.remove();
+                                                    }
+                                                    retryLastMessage();
+                                                };
+
+                                                const target = document.querySelector(`[data-temp-id="${tempId}"]`);
+                                                if (target) {
+                                                    const contentDiv = target.querySelector('.message-content');
+                                                    contentDiv.appendChild(document.createElement('br'));
+                                                    contentDiv.appendChild(retryButton);
+                                                }
+                                            }
+                                        }
+                                        break;
                                     default:
+                                        console.log('Unknown event type:', data.event);
                                         break;
                                 }
                             } catch (error) {
-                                continue
+                                console.error('Error when handling event:', error, line);
+                                const errorMsg = '\n\n⚠️ Error when handling server response';
+
+                                if (messageContentDiv.dataset.hasTools === 'true') {
+                                    messageContentDiv.appendChild(document.createTextNode(errorMsg));
+
+                                    const retryButton = document.createElement('button');
+                                    retryButton.className = 'retry-button';
+                                    retryButton.textContent = 'Retry';
+                                    retryButton.onclick = function () {
+                                        retryLastMessage();
+                                    };
+                                    messageContentDiv.appendChild(document.createElement('br'));
+                                    messageContentDiv.appendChild(retryButton);
+                                } else {
+                                    assistantContent += errorMsg;
+                                    updateMessage(tempId, assistantContent);
+
+                                    const target = document.querySelector(`[data-temp-id="${tempId}"]`);
+                                    if (target) {
+                                        const contentDiv = target.querySelector('.message-content');
+                                        contentDiv.appendChild(document.createElement('br'));
+
+                                        const retryButton = document.createElement('button');
+                                        retryButton.className = 'retry-button';
+                                        retryButton.textContent = 'Retry';
+                                        retryButton.onclick = function () {
+                                            target.remove();
+                                            retryLastMessage();
+                                        };
+
+                                        contentDiv.appendChild(retryButton);
+                                    }
+                                }
+                                continue;
                             }
                         }
 
                         chatBox.scrollTop = chatBox.scrollHeight;
 
                         return push();
+                    }).catch(error => {
+                        console.error('Error when reading response:', error);
+                        const errorMsg = `\n\n⚠️ Error when reading response: ${error.message}`;
+
+                        if (messageContentDiv.dataset.hasTools === 'true') {
+                            messageContentDiv.appendChild(document.createTextNode(errorMsg));
+
+                            const retryButton = document.createElement('button');
+                            retryButton.className = 'retry-button';
+                            retryButton.textContent = 'Retry';
+                            retryButton.onclick = function () {
+                                retryLastMessage();
+                            };
+                            messageContentDiv.appendChild(document.createElement('br'));
+                            messageContentDiv.appendChild(retryButton);
+                        } else {
+                            updateMessage(tempId, assistantContent + errorMsg);
+
+                            const target = document.querySelector(`[data-temp-id="${tempId}"]`);
+                            if (target) {
+                                const contentDiv = target.querySelector('.message-content');
+                                contentDiv.appendChild(document.createElement('br'));
+
+                                const retryButton = document.createElement('button');
+                                retryButton.className = 'retry-button';
+                                retryButton.textContent = 'Retry';
+                                retryButton.onclick = function () {
+                                    target.remove();
+                                    retryLastMessage();
+                                };
+
+                                contentDiv.appendChild(retryButton);
+                            }
+                        }
                     });
                 }
 
                 return push();
             }).catch(error => {
+                clearTimeout(fetchTimeout);
                 console.error('Error:', error);
-                updateMessage(tempId, '⚠️ Something went wrong. Please try again later.');
+                updateMessage(tempId, '⚠️ Failed to connect to server: ' + error.message);
+
+                const target = document.querySelector(`[data-temp-id="${tempId}"]`);
+                if (target) {
+                    const contentDiv = target.querySelector('.message-content');
+                    contentDiv.appendChild(document.createElement('br'));
+
+                    const retryButton = document.createElement('button');
+                    retryButton.className = 'retry-button';
+                    retryButton.textContent = 'Retry';
+                    retryButton.onclick = function () {
+                        target.remove();
+                        retryLastMessage();
+                    };
+
+                    contentDiv.appendChild(retryButton);
+                }
             }).finally(() => {
+                clearTimeout(fetchTimeout);
                 input.disabled = false;
                 document.querySelector('#send-btn').disabled = false;
                 input.focus();
+
+                if (messageContentDiv.dataset.hasTools === 'true') {
+                    messageContentDiv.innerHTML = messageContentDiv.innerHTML.replace('▌', '');
+                }
             });
         }
 
@@ -302,17 +798,17 @@
                         'Content-Type': 'application/json'
                     }
                 })
-                .then(response => {
-                    if (response.ok) {
-                        window.location.href = '/new_chat';
-                    } else {
-                        alert('Failed to clear history. Please try again.');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred. Please try again.');
-                });
+                    .then(response => {
+                        if (response.ok) {
+                            window.location.href = '/new_chat';
+                        } else {
+                            alert('Failed to clear history. Please try again.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred. Please try again.');
+                    });
             }
         }
     </script>

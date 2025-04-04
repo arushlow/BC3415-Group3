@@ -851,3 +851,182 @@ footer {
     color: white;
     margin-top: auto;
 }
+.tool-call-container {
+    background-color: rgba(0, 123, 255, 0.05);
+    border: 1px solid rgba(0, 123, 255, 0.2);
+    border-radius: 10px;
+    margin: 10px 0;
+    overflow: hidden;
+}
+
+.tool-call-header {
+    background-color: rgba(0, 123, 255, 0.1);
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid rgba(0, 123, 255, 0.2);
+}
+
+.tool-icon {
+    margin-right: 8px;
+    font-size: 16px;
+}
+
+.tool-name {
+    font-weight: 600;
+    font-size: 14px;
+    color: #0056b3;
+}
+
+.tool-call-args {
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid rgba(0, 123, 255, 0.2);
+    overflow-x: auto;
+}
+
+.tool-call-args pre {
+    margin: 0;
+    padding: 0;
+    background-color: transparent;
+    font-family: monospace;
+    white-space: pre-wrap;
+    font-size: 13px;
+    overflow-x: auto;
+    max-height: 200px;
+    overflow-y: auto;
+    border: none;
+}
+
+.tool-call-result {
+    padding: 10px;
+}
+
+.tool-result-header {
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 8px;
+    color: #28a745;
+    display: flex;
+    align-items: center;
+}
+
+.tool-result-content {
+    background-color: rgba(40, 167, 69, 0.05);
+    border: 1px solid rgba(40, 167, 69, 0.2);
+    border-radius: 6px;
+    padding: 10px;
+    font-family: monospace;
+    white-space: pre-wrap;
+    font-size: 13px;
+    overflow-x: auto;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.tool-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    color: #666;
+    font-style: italic;
+}
+
+.tool-loading::after {
+    content: "...";
+    animation: loading 1.5s infinite;
+    width: 24px;
+    display: inline-block;
+    text-align: left;
+}
+
+@keyframes loading {
+    0% {
+        content: ".";
+    }
+
+    33% {
+        content: "..";
+    }
+
+    66% {
+        content: "...";
+    }
+}
+
+.thinking-indicator {
+    color: #666;
+    font-style: italic;
+    padding: 8px 0;
+}
+
+.user-message .tool-call-container {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.user-message .tool-call-header {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-bottom-color: rgba(255, 255, 255, 0.3);
+}
+
+.user-message .tool-name {
+    color: white;
+}
+
+.user-message .tool-call-args {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+    border-bottom-color: rgba(255, 255, 255, 0.3);
+}
+
+.user-message .tool-result-content {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: white;
+}
+
+.user-message .tool-result-header {
+    color: white;
+}
+
+.retry-button {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 5px 10px;
+    margin-top: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: background-color 0.2s;
+}
+
+.retry-button:hover {
+    background-color: #5a6268;
+}
+
+.retry-indicator {
+    color: #6c757d;
+    font-style: italic;
+    text-align: center;
+    padding: 10px;
+    margin: 10px 0;
+    background-color: rgba(108, 117, 125, 0.1);
+    border-radius: 8px;
+}
+
+.retry-message {
+    opacity: 0.7;
+}
+
+.tool-call-result .retry-button {
+    margin-top: 10px;
+    display: block;
+    background-color: #d9534f;
+}
+
+.tool-call-result .retry-button:hover {
+    background-color: #c9302c;
+}
