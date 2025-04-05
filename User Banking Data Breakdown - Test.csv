@@ -1,0 +1,201 @@
+﻿Bank Account ID,Date,Description,Amount
+1,2025-03-04,Amazon,-2188.26
+1,2024-12-23,Utilities,-3071.26
+1,2025-03-07,Restaurant Bill,-1370.27
+1,2025-02-09,Rent Payment,2767.42
+1,2024-12-13,Investment,3305.06
+1,2025-02-07,Gym Membership,372.17
+1,2024-12-19,Payroll Deposit,3699.58
+1,2025-02-27,Starbucks,4715.09
+1,2025-02-25,Payroll Deposit,441.05
+1,2025-01-17,Amazon,136.18
+1,2024-12-24,Investment,-3923.27
+1,2025-02-01,Grocery,1942.06
+1,2024-12-27,Loan Repayment,852.07
+1,2025-02-04,Netflix Subscription,1345.69
+1,2025-01-14,Netflix Subscription,2108.41
+1,2025-01-23,Netflix Subscription,-4721.39
+1,2024-12-24,Investment,981.76
+1,2025-03-10,Grocery,-1664.42
+1,2025-01-13,Rent Payment,-2155.93
+1,2025-01-31,Rent Payment,-3018.04
+2,2025-01-29,Payroll Deposit,-4823.05
+2,2024-12-12,Restaurant Bill,-2457.58
+2,2025-01-28,Grocery,-1405.1
+2,2025-02-24,Bank Fees,-2821.43
+2,2025-02-15,Restaurant Bill,3839.25
+2,2025-02-12,Insurance Payment,-3989.44
+2,2025-01-17,Restaurant Bill,-2499.02
+2,2025-02-06,Restaurant Bill,774.95
+2,2025-03-01,Insurance Payment,4953.55
+2,2025-01-01,Loan Repayment,-4617.86
+2,2024-12-31,Starbucks,3954.65
+2,2024-12-24,Restaurant Bill,4572.43
+2,2024-12-16,Restaurant Bill,-1778.27
+2,2024-12-28,Restaurant Bill,3388.97
+2,2025-01-14,Amazon,57.69
+2,2025-01-03,Loan Repayment,-2904.69
+2,2025-01-22,Grocery,-2318
+2,2025-02-19,Rent Payment,4988.53
+2,2025-01-16,Bank Fees,4808.83
+2,2025-01-25,Netflix Subscription,-1718.62
+3,2025-01-08,Rent Payment,2383.43
+3,2025-01-29,Amazon,-1504.82
+3,2025-03-08,Tax Refund,1718.67
+3,2025-02-07,Loan Repayment,876.39
+3,2025-01-10,Transfer,-3989.79
+3,2024-12-19,Restaurant Bill,2163.51
+3,2025-01-12,Investment,2150.62
+3,2025-02-12,Netflix Subscription,-3762.87
+3,2024-12-27,Amazon,-3998.51
+3,2025-01-28,Transfer,2290.46
+3,2025-01-02,Restaurant Bill,1570.45
+3,2024-12-25,Amazon,-1742.88
+3,2024-12-14,Gym Membership,-4004.06
+3,2024-12-14,Payroll Deposit,1569.36
+3,2025-02-15,Rent Payment,-3468.72
+3,2024-12-24,Payroll Deposit,2876.16
+3,2024-12-19,Loan Repayment,-3468.7
+3,2024-12-29,Payroll Deposit,2450.76
+3,2025-01-12,Investment,272.79
+3,2025-01-07,Payroll Deposit,979.67
+4,2024-12-17,Insurance Payment,2048.63
+4,2025-01-07,Payroll Deposit,417.94
+4,2025-02-01,Starbucks,-1377.89
+4,2025-01-11,Investment,-3713.88
+4,2025-02-24,Investment,-575.46
+4,2024-12-31,Tax Refund,-3785.15
+4,2024-12-31,Transfer,4948.93
+4,2025-01-31,Tax Refund,4996.57
+4,2025-02-27,Insurance Payment,4327.13
+4,2025-02-12,Utilities,-3689.38
+4,2025-02-17,Investment,700.48
+4,2025-03-03,Investment,1757.32
+4,2025-02-17,Rent Payment,4895.11
+4,2025-01-04,Bank Fees,3398.1
+4,2025-03-03,Netflix Subscription,4335.9
+4,2025-02-07,Payroll Deposit,-3558.42
+4,2025-01-07,Payroll Deposit,2889.24
+4,2025-01-21,Insurance Payment,-382.2
+4,2025-01-18,Loan Repayment,-3750.26
+4,2025-01-11,Insurance Payment,1639.81
+5,2025-01-11,Restaurant Bill,3322.4
+5,2025-01-01,Grocery,1093.06
+5,2025-01-06,Netflix Subscription,1617.71
+5,2024-12-27,Payroll Deposit,2832.88
+5,2024-12-13,Utilities,246.8
+5,2025-03-08,Amazon,4647.52
+5,2025-03-10,Grocery,-1015.58
+5,2024-12-17,Netflix Subscription,-799.09
+5,2025-02-27,Restaurant Bill,1805.37
+5,2025-03-04,Grocery,-3129.89
+5,2025-01-15,Restaurant Bill,460.54
+5,2025-01-08,Amazon,667.84
+5,2025-03-09,Starbucks,-3479.51
+5,2024-12-12,Payroll Deposit,2391.11
+5,2025-02-25,Amazon,-1570.19
+5,2025-01-21,Utilities,-4067.77
+5,2025-03-02,Loan Repayment,-2818.64
+5,2025-01-13,Rent Payment,-3613.55
+5,2025-01-17,Investment,-3434.4
+5,2025-02-26,Payroll Deposit,-3763.47
+6,2025-01-25,Grocery,1575.95
+6,2024-12-18,Amazon,-1244.59
+6,2024-12-12,Starbucks,-4240.22
+6,2025-02-12,Loan Repayment,3036.6
+6,2025-02-01,Restaurant Bill,-277.57
+6,2025-01-06,Grocery,568.15
+6,2025-01-02,Bank Fees,-4888.6
+6,2025-02-22,Grocery,-4304.77
+6,2024-12-31,Restaurant Bill,867.99
+6,2025-03-08,Investment,342.33
+6,2025-03-03,Utilities,1992.89
+6,2025-01-16,Grocery,3510.54
+6,2025-01-01,Investment,767.64
+6,2025-01-04,Bank Fees,-1019.97
+6,2025-01-28,Grocery,-2934.25
+6,2025-01-30,Gym Membership,-2190.24
+6,2025-03-03,Transfer,435.63
+6,2024-12-22,Investment,-279.87
+6,2025-02-23,Starbucks,-3540.96
+6,2025-01-06,Rent Payment,-2617.41
+7,2025-02-17,Rent Payment,-639.02
+7,2025-02-23,Utilities,4499.99
+7,2025-02-04,Loan Repayment,-324.04
+7,2025-01-06,Insurance Payment,2556.36
+7,2025-01-22,Payroll Deposit,1279.3
+7,2025-02-09,Gym Membership,2546.58
+7,2025-02-07,Starbucks,2361.46
+7,2025-02-16,Bank Fees,4801.91
+7,2025-02-10,Rent Payment,-1245.07
+7,2025-02-04,Tax Refund,394.05
+7,2024-12-14,Bank Fees,268.1
+7,2025-03-05,Grocery,349.29
+7,2025-01-30,Rent Payment,436.5
+7,2025-02-13,Netflix Subscription,2821.21
+7,2025-01-10,Rent Payment,2960.5
+7,2024-12-31,Utilities,3980.89
+7,2025-03-07,Transfer,-2710.02
+7,2025-01-27,Starbucks,3795.85
+7,2025-02-25,Transfer,2651.42
+7,2025-03-03,Payroll Deposit,3559.7
+8,2025-01-03,Grocery,3505.73
+8,2024-12-26,Amazon,-2529.61
+8,2025-03-01,Investment,2841.26
+8,2025-02-08,Netflix Subscription,1308.65
+8,2024-12-11,Tax Refund,3678.09
+8,2025-02-09,Amazon,4718.06
+8,2025-02-19,Amazon,826.05
+8,2025-02-23,Loan Repayment,-1794.65
+8,2025-01-30,Insurance Payment,1328.71
+8,2024-12-13,Netflix Subscription,-4132.8
+8,2025-02-11,Tax Refund,4283.58
+8,2025-01-24,Grocery,-2569.73
+8,2025-02-16,Starbucks,-4760.72
+8,2025-02-26,Insurance Payment,-514.03
+8,2025-03-09,Starbucks,-4152.71
+8,2025-02-13,Tax Refund,-2005.91
+8,2024-12-26,Investment,-1297.81
+8,2025-03-02,Transfer,4512.97
+8,2025-02-27,Bank Fees,-4237.14
+8,2025-03-05,Insurance Payment,-257.94
+9,2025-01-19,Insurance Payment,-152.26
+9,2025-01-24,Transfer,4541.98
+9,2025-02-19,Starbucks,-3072.46
+9,2025-01-06,Grocery,4414.48
+9,2025-02-03,Grocery,690.49
+9,2025-02-07,Restaurant Bill,-4970.47
+9,2025-01-21,Utilities,3568.29
+9,2025-01-25,Bank Fees,2830.43
+9,2025-02-15,Starbucks,1597.79
+9,2025-03-03,Utilities,-4957.7
+9,2025-02-18,Amazon,1243.05
+9,2025-03-03,Utilities,4981.98
+9,2025-01-24,Bank Fees,-4196.92
+9,2025-02-08,Investment,-1593.43
+9,2024-12-25,Starbucks,3518.75
+9,2024-12-28,Transfer,-4184.3
+9,2024-12-31,Netflix Subscription,881.91
+9,2025-02-09,Investment,-1097.95
+9,2025-01-27,Bank Fees,-3072.6
+9,2025-02-16,Bank Fees,-4013.11
+10,2025-03-08,Payroll Deposit,-2935.11
+10,2025-01-02,Tax Refund,1827.62
+10,2024-12-25,Amazon,1686.12
+10,2025-01-14,Utilities,3198.13
+10,2025-02-16,Gym Membership,-4843.87
+10,2025-02-10,Restaurant Bill,2946.81
+10,2024-12-12,Netflix Subscription,-641.11
+10,2024-12-28,Starbucks,914.5
+10,2024-12-19,Investment,525.03
+10,2025-03-01,Transfer,1737.32
+10,2024-12-15,Restaurant Bill,3647.78
+10,2025-02-05,Transfer,1251.46
+10,2025-02-25,Gym Membership,11.4
+10,2025-02-17,Bank Fees,-2073.03
+10,2024-12-31,Grocery,511.64
+10,2025-02-18,Insurance Payment,-373.18
+10,2025-03-08,Rent Payment,1309.33
+10,2025-02-17,Bank Fees,-1880.41
+10,2025-02-27,Rent Payment,-2972.18
+10,2025-03-07,Grocery,4712.5

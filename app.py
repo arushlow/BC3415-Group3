@@ -4,9 +4,14 @@ import json
 import logging
 import os
 import threading
+from io import StringIO, BytesIO
 import uuid
+import csv
 from datetime import datetime
 from functools import wraps
+import numpy as np
+import matplotlib.pyplot as plt
+
 
 from dotenv import load_dotenv
 from flask import (
@@ -22,9 +27,10 @@ from flask import (
 from flask_bcrypt import Bcrypt
 from openai import OpenAI
 from peewee import IntegrityError
+from peewee import *
 
 from mcp_server.client import MCPClient
-from model import ChatHistory, User, create_tables, database
+from model import ChatHistory, User, DataOverview, DataTransaction, DataInvestment, create_tables, database
 from simulation import simulate_retirement
 
 create_tables()
@@ -664,6 +670,238 @@ def home():
         return render_template("homepage.html", username=session["username"])
     return redirect(url_for("welcome"))
 
+
+@app.route("/dashboard")
+def dashboard():
+    data_invest = DataInvestment.select().where(DataInvestment.user == session['username'])
+    data_overview = DataOverview.select().where(DataOverview.user == session['username'])
+    timestamp1 = np.random.randint(1, 1000000)
+    timestamp2 = np.random.randint(1, 1000000)
+    invest_totals = {
+        "Bonds": 0,
+        "ETF": 0,
+        "Mutual Fund": 0,
+        "Stock": 0  
+    }
+    for invest in data_invest:
+        invest_totals[invest.invest_type] += invest.amount
+        
+    # Pass flag to show graph based on button click
+    show_bank_chart = request.args.get('show_bank_chart', False)
+    show_invest_chart = request.args.get('show_invest_chart', False)
+    
+    return render_template("dashboard.html", investment=data_invest, invest_totals=invest_totals, overview=data_overview,timestamp1=timestamp1,timestamp2=timestamp2, show_bank_chart=show_bank_chart, show_invest_chart=show_invest_chart)
+
+@app.route("/view_overview")
+def view_overview():
+    overview = DataOverview.select().where(DataOverview.user == session["username"])
+
+    fig, ax = plt.subplots(figsize=(10, 6))
+    
+    bank_accounts={}
+    for account in overview:
+        if account.bank_name not in bank_accounts:
+            bank_accounts[account.bank_name] = {}
+            
+        bank_accounts[account.bank_name][account.account_type] = account.balance
+
+
+    index = np.arange(len(bank_accounts))
+    bottom = np.zeros(len(bank_accounts))
+    
+    for i, (bank, data) in enumerate(bank_accounts.items()):
+        for j, (account, balance) in enumerate(data.items()):
+            ax.bar(index[i], balance, 0.8, bottom=bottom[i], label=f'{bank} Account', color=np.random.rand(3,))
+            bottom[i] += float(balance)
+            ax.text(
+                index[i],
+                bottom[i] - float(balance) / 2,
+                f'{account}',
+                ha='center',
+                va='center',
+                color='white',
+                fontweight='bold'
+            )
+            
+    ax.set_ylabel('Total Balance')
+    ax.set_title('Bank Account Balances Stacked by Bank')
+    ax.set_xticks(index)
+    ax.set_xticklabels(list(bank_accounts.keys()))
+    
+    img = BytesIO()
+    plt.savefig(img, format='png')
+    img.seek(0)
+
+    plt.close(fig)
+
+    response = Response(img.getvalue(), mimetype='image/png')
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    
+    return response
+
+@app.route("/view_invest")
+def view_invest():
+    username = session['username']
+    
+    data = DataInvestment.select().where(DataInvestment.user == username)
+    invest_groups = {}
+    for invest in data:
+        invest_type = invest.invest_type
+        amount = invest.amount
+        if invest_type not in invest_groups:
+            invest_groups[invest_type] = 0
+        invest_groups[invest_type] += amount   
+    fig = plt.figure(figsize=(8, 8))
+    plt.pie(invest_groups.values(), labels=invest_groups.keys(), autopct='%1.1f%%', startangle=140)
+    plt.title(f'{username} Investment Distribution')
+    
+    img = BytesIO()
+    plt.savefig(img, format='png')
+    img.seek(0)
+
+    plt.close(fig)
+
+    response = Response(img.getvalue(), mimetype='image/png')
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    
+    return response
+
+@app.route("/account/<int:account_id>")
+def account_details(account_id):
+    account = DataTransaction.select().where((DataTransaction.user == session["username"]) & (DataTransaction.bank_account_id == account_id))
+    return render_template("account_info.html", account=account)
+
+
+@app.route("/data")
+def data():
+    return render_template("data.html")
+
+@app.route("/data_overview", methods=['POST'])
+def data_overview():
+    #if 'overview' not in request.files:
+        #return redirect(request.url)
+    
+    file = request.files['overview']
+    
+    if file:
+        file_content = file.stream.read().decode("utf-8-sig")
+        csv_file = StringIO(file_content)
+        csvreader = csv.DictReader(csv_file, delimiter=",")
+        
+        for line in csvreader:
+            balance = float(line['Balance'].replace(',', ''))
+            existing = DataOverview.select().where(DataOverview.account_id == int(line['Account ID']), DataOverview.user == session["username"]).first()
+            if existing:
+                existing.balance = balance
+                existing.save()
+                print(f"Updated Account ID: {int(line['Account ID'])} with new balance: {balance}")
+            else:
+                DataOverview.create(
+                    user=session["username"],
+                    account_id=int(line['Account ID']),
+                    bank_name=line['Bank Name'],
+                    bank_name_short=line['Bank Name (Short)'],
+                    account_type=line['Account Type'],
+                    balance=balance
+                )
+            
+    data_overviews = DataOverview.select().where(DataOverview.user == session['username'])
+
+    if data_overviews.exists():
+        for data in data_overviews:
+            print(f"Account ID: {data.account_id}, Bank Name: {data.bank_name}, Balance: {data.balance}")
+    else:
+        print("No data available in DataOverview.")
+    
+    return 'CSV data has been uploaded and processed'
+
+@app.route("/data_transaction", methods=['POST'])
+def data_transaction():
+    #if 'overview' not in request.files:
+        #return redirect(request.url)
+    
+    file = request.files['transaction']
+    
+    if file:
+        file_content = file.stream.read().decode("utf-8-sig")
+        csv_file = StringIO(file_content)
+        csvreader = csv.DictReader(csv_file, delimiter=",")
+        
+        print(f"CSV Headers: {csvreader.fieldnames}")
+        
+        for line in csvreader:
+            try:
+                bank_account = DataOverview.get(DataOverview.account_id == int(line['Bank Account ID']))
+                print(bank_account)
+                DataTransaction.create(
+                user=session["username"],
+                bank_account_id=bank_account,
+                date=datetime.strptime(line['Date'], '%Y-%m-%d').date(),
+                description=line['Description'],
+                amount=float(line['Amount'].replace(',', '')),
+            )
+            except DataOverview.DoesNotExist:
+                print(f"Account ID {line['Bank Account ID']} does not exist in DataOverview. Skipping transaction.")
+                continue 
+            
+    transactions = DataTransaction.select().where(DataTransaction.user == session["username"])
+
+        # Print out the records from the database
+    print("Added Records in Database:")
+    for transaction in transactions:
+        print(f"Account ID: {transaction.bank_account_id.account_id}, Date: {transaction.date}, "
+            f"Description: {transaction.description}, Amount: {transaction.amount}")
+
+    
+    return 'CSV data has been uploaded and processed'
+
+@app.route("/data_invest", methods=['POST'])
+def data_invest():
+    #if 'overview' not in request.files:
+        #return redirect(request.url)
+    
+    file = request.files['invest']
+    
+    if file:
+        file_content = file.stream.read().decode("utf-8-sig")
+        csv_file = StringIO(file_content)
+        csvreader = csv.DictReader(csv_file, delimiter=",")
+        
+        print(f"CSV Headers: {csvreader.fieldnames}")
+        
+        for line in csvreader:
+            amount = float(line['Amount Invested'].replace(',', ''))
+            existing = DataInvestment.select().where(DataInvestment.name == line['Investment Name'], DataInvestment.user == session["username"]).first()
+            if existing:
+                existing.amount = amount
+                existing.date = datetime.strptime(line['Investment Date'], '%Y-%m-%d').date()
+                existing.save()
+                print(f"Updated Investment Named: {line['Investment Name']} with new balance: {amount}")
+            else:
+                DataInvestment.create(
+                    user=session["username"],
+                    name=line['Investment Name'],
+                    ticker=line['Ticker Name'],
+                    invest_type=line['Investment Type'],
+                    amount=amount,
+                    date=datetime.strptime(line['Investment Date'], '%Y-%m-%d').date(),
+                )
+
+            
+    invest = DataInvestment.select().where(DataInvestment.user == session["username"])
+
+        # Print out the records from the database
+    print("Added Records in Database:")
+    for investment in invest:
+        print(f"Date: {investment.date}, "
+            f"Name: {investment.name}, Amount: {investment.amount}")
+
+    
+    return 'CSV data has been uploaded and processed'
 
 @app.errorhandler(404)
 def page_not_found(e):

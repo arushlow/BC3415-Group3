@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+</head>
+
+<body>
+    <h1>Account Transactions</h1>  
+    <table>
+        <tr>
+            <td>Account Overview</td>
+        </tr>
+        <tr>
+            <td>Description</td>
+            <td>Amount</td>
+            <td>Date</td>
+        </tr>
+        {% for transaction in account %}
+        <tr>
+            <td>{{transaction.description}}</td>
+            <td>{{transaction.amount}}</td>
+            <td>{{transaction.date}}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+</body>
+
+</html>
