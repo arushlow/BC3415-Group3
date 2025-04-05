@@ -61,6 +61,7 @@ class DataTransaction(BaseModel):
 class DataInvestment(BaseModel):
     user = ForeignKeyField(User, backref="invest")
     name = CharField()
+    ticker = CharField()
     invest_type = CharField()
     amount = DecimalField(decimal_places=2)
     date = DateField()

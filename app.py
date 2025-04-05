@@ -525,6 +525,7 @@ def data_invest():
                 DataInvestment.create(
                     user=session["username"],
                     name=line['Investment Name'],
+                    ticker=line['Ticker Name'],
                     invest_type=line['Investment Type'],
                     amount=amount,
                     date=datetime.strptime(line['Investment Date'], '%Y-%m-%d').date(),
