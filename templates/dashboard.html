@@ -12,8 +12,16 @@
 
     <h2>Bank Account Balances Chart</h2>
     
-    <!-- Display the graph -->
-    <img src="{{ url_for('view_overview') }}?{{ timestamp1 }}" alt="Account Balance Chart">
+    <!-- Button to load the bank chart -->
+    <form method="GET" action="{{ url_for('dashboard') }}">
+        <button type="submit" name="show_bank_chart" value="1">Load Bank Chart</button>
+    </form>
+
+    {% if show_bank_chart %}
+        <div>
+            <img src="{{ url_for('view_overview') }}" alt="Account Balance Chart">
+        </div>
+    {% endif %}
     
     <table>
         <tr>
@@ -34,8 +42,15 @@
     </table>
 
 
-    <!-- Display the graph -->
-    <img src="{{ url_for('view_invest') }}?{{ timestamp2 }}" alt="Investment Balance Chart">
+    <form method="GET" action="{{ url_for('dashboard') }}">
+        <button type="submit" name="show_invest_chart" value="1">Load Investment Chart</button>
+    </form>
+
+    {% if show_invest_chart %}
+        <div>
+            <img src="{{ url_for('view_invest') }}" alt="Investment Distribution Chart">
+        </div>
+    {% endif %}
 
 
     <table>

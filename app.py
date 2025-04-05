@@ -685,8 +685,12 @@ def dashboard():
     }
     for invest in data_invest:
         invest_totals[invest.invest_type] += invest.amount
+        
+    # Pass flag to show graph based on button click
+    show_bank_chart = request.args.get('show_bank_chart', False)
+    show_invest_chart = request.args.get('show_invest_chart', False)
     
-    return render_template("dashboard.html", investment=data_invest, invest_totals=invest_totals, overview=data_overview,timestamp1=timestamp1,timestamp2=timestamp2)
+    return render_template("dashboard.html", investment=data_invest, invest_totals=invest_totals, overview=data_overview,timestamp1=timestamp1,timestamp2=timestamp2, show_bank_chart=show_bank_chart, show_invest_chart=show_invest_chart)
 
 @app.route("/view_overview")
 def view_overview():
@@ -728,7 +732,9 @@ def view_overview():
     plt.savefig(img, format='png')
     img.seek(0)
 
-    response = Response(img, mimetype='image/png')
+    plt.close(fig)
+
+    response = Response(img.getvalue(), mimetype='image/png')
     response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
     response.headers['Pragma'] = 'no-cache'
     response.headers['Expires'] = '0'
@@ -747,7 +753,7 @@ def view_invest():
         if invest_type not in invest_groups:
             invest_groups[invest_type] = 0
         invest_groups[invest_type] += amount   
-    plt.figure(figsize=(8,8))
+    fig = plt.figure(figsize=(8, 8))
     plt.pie(invest_groups.values(), labels=invest_groups.keys(), autopct='%1.1f%%', startangle=140)
     plt.title(f'{username} Investment Distribution')
     
@@ -755,7 +761,9 @@ def view_invest():
     plt.savefig(img, format='png')
     img.seek(0)
 
-    response = Response(img, mimetype='image/png')
+    plt.close(fig)
+
+    response = Response(img.getvalue(), mimetype='image/png')
     response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
     response.headers['Pragma'] = 'no-cache'
     response.headers['Expires'] = '0'
