@@ -74,6 +74,27 @@ body {
     border-radius: 50%;
 }
 
+.sidebar-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+#clear-history-btn {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px;
+}
+
+#clear-history-btn:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+}
+
 .chat-list {
     overflow-y: auto;
     flex-grow: 1;
@@ -176,12 +197,54 @@ footer {
     background-color: #0056b3; /* Darker blue */
 }
 
-/* CTA Button Container for Features */
-.cta-buttons {
+/* Features Page Enhancements */
+.features-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    padding: 40px;
+    max-width: 1200px;
+    margin: auto;
+}
+
+.feature-card {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
     display: flex;
-    flex-direction: column; /* Stack buttons vertically */
-    align-items: center; /* Center the buttons */
-    margin: 20px 0;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+}
+
+.feature-icon {
+    font-size: 40px;
+    margin-bottom: 10px;
+}
+
+.feature-title {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.feature-description {
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+@media (max-width: 768px) {
+    .features-container {
+        grid-template-columns: 1fr;
+    }
 }
 
 /* Chatbot Window */
@@ -347,7 +410,7 @@ footer {
 #ai-adjustments-form h2 {
     font-size: 1.8em;
     margin-bottom: 15px;
-    color: #003366;
+    color: #007BFF;
 }
 
 .input-group {
@@ -381,7 +444,7 @@ footer {
 }
 
 button.cta-button {
-    background-color: #003366; /* Deep blue */
+    background-color: #007BFF; /* Deep blue */
     color: white;
     border: none;
     padding: 12px 20px;
@@ -723,4 +786,247 @@ button.cta-button:hover {
 #chat-header-title {
     flex: 1;
     margin: 0;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    text-align: center;
+}
+
+/* Header */
+h1 {
+    background-color: #007BFF;
+    color: white;
+    padding: 0px;
+    text-align: center;
+    position: sticky;
+    top: -20;
+    z-index: 100;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Subheading */
+h2 {
+    font-size: 1.6rem;
+    margin-bottom: 1.5rem;
+    color: #555;
+}
+
+.cta-buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px; /* Adds space between buttons */
+}
+
+.cta-button {
+    display: block;
+    width: 200px; /* Set a fixed width for better alignment */
+    text-align: center;
+    padding: 12px 20px;
+    background-color: #007BFF;
+    color: white;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 1.2em;
+    transition: background 0.3s ease;
+}
+
+.cta-button:hover {
+    background-color: #0056b3;
+}
+
+footer {
+    text-align: center;
+    padding: 10px;
+    background-color: #333;
+    color: white;
+    margin-top: auto;
+}
+.tool-call-container {
+    background-color: rgba(0, 123, 255, 0.05);
+    border: 1px solid rgba(0, 123, 255, 0.2);
+    border-radius: 10px;
+    margin: 10px 0;
+    overflow: hidden;
+}
+
+.tool-call-header {
+    background-color: rgba(0, 123, 255, 0.1);
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid rgba(0, 123, 255, 0.2);
+}
+
+.tool-icon {
+    margin-right: 8px;
+    font-size: 16px;
+}
+
+.tool-name {
+    font-weight: 600;
+    font-size: 14px;
+    color: #0056b3;
+}
+
+.tool-call-args {
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid rgba(0, 123, 255, 0.2);
+    overflow-x: auto;
+}
+
+.tool-call-args pre {
+    margin: 0;
+    padding: 0;
+    background-color: transparent;
+    font-family: monospace;
+    white-space: pre-wrap;
+    font-size: 13px;
+    overflow-x: auto;
+    max-height: 200px;
+    overflow-y: auto;
+    border: none;
+}
+
+.tool-call-result {
+    padding: 10px;
+}
+
+.tool-result-header {
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 8px;
+    color: #28a745;
+    display: flex;
+    align-items: center;
+}
+
+.tool-result-content {
+    background-color: rgba(40, 167, 69, 0.05);
+    border: 1px solid rgba(40, 167, 69, 0.2);
+    border-radius: 6px;
+    padding: 10px;
+    font-family: monospace;
+    white-space: pre-wrap;
+    font-size: 13px;
+    overflow-x: auto;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.tool-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    color: #666;
+    font-style: italic;
+}
+
+.tool-loading::after {
+    content: "...";
+    animation: loading 1.5s infinite;
+    width: 24px;
+    display: inline-block;
+    text-align: left;
+}
+
+@keyframes loading {
+    0% {
+        content: ".";
+    }
+
+    33% {
+        content: "..";
+    }
+
+    66% {
+        content: "...";
+    }
+}
+
+.thinking-indicator {
+    color: #666;
+    font-style: italic;
+    padding: 8px 0;
+}
+
+.user-message .tool-call-container {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.user-message .tool-call-header {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-bottom-color: rgba(255, 255, 255, 0.3);
+}
+
+.user-message .tool-name {
+    color: white;
+}
+
+.user-message .tool-call-args {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+    border-bottom-color: rgba(255, 255, 255, 0.3);
+}
+
+.user-message .tool-result-content {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: white;
+}
+
+.user-message .tool-result-header {
+    color: white;
+}
+
+.retry-button {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 5px 10px;
+    margin-top: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: background-color 0.2s;
+}
+
+.retry-button:hover {
+    background-color: #5a6268;
+}
+
+.retry-indicator {
+    color: #6c757d;
+    font-style: italic;
+    text-align: center;
+    padding: 10px;
+    margin: 10px 0;
+    background-color: rgba(108, 117, 125, 0.1);
+    border-radius: 8px;
+}
+
+.retry-message {
+    opacity: 0.7;
+}
+
+.tool-call-result .retry-button {
+    margin-top: 10px;
+    display: block;
+    background-color: #d9534f;
+}
+
+.tool-call-result .retry-button:hover {
+    background-color: #c9302c;
 }

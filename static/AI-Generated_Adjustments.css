@@ -1,0 +1,93 @@
+/* General Page Styling */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f7fc;
+    color: #333;
+}
+
+/* Header */
+h1 {
+    text-align: center;
+    background-color: #007BFF;
+    color: white;
+    padding: 2rem 1rem;
+    margin-bottom: 2rem;
+    font-size: 2.2rem;
+}
+
+/* Form Section */
+#preferences-form {
+    max-width: 600px;
+    background-color: white;
+    margin: 0 auto;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Form Elements */
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+label {
+    font-weight: 600;
+    color: #555;
+}
+
+input, select {
+    padding: 0.75rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease-in-out;
+}
+
+input:focus, select:focus {
+    border-color: #007BFF;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0, 102, 178, 0.2);
+}
+
+/* Submit Button */
+.cta-button {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.2s;
+}
+
+.cta-button:hover {
+    background-color: #0055a4;
+    transform: scale(1.03);
+}
+
+/* Recommendation Summary */
+#recommendation-summary {
+    max-width: 600px;
+    margin: 2rem auto;
+    background-color: #e9f7ef;
+    border-left: 4px solid #28a745;
+    padding: 1rem;
+    font-size: 1rem;
+    border-radius: 4px;
+    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    #preferences-form, #recommendation-summary {
+        width: 90%;
+    }
+}
