@@ -11,7 +11,13 @@ from peewee import (
     DateField
 )
 
-database = SqliteDatabase("fintwin.db")
+database = SqliteDatabase("fintwin.db", pragmas={
+    'journal_mode': 'wal',
+    'cache_size': -1024 * 64,
+    'foreign_keys': 1,
+    'synchronous': 1,
+    'busy_timeout': 20000
+})
 
 
 class BaseModel(Model):
