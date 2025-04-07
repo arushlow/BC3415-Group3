@@ -1,5 +1,9 @@
 Flask
-dotenv
+python-dotenv
 peewee
 flask-bcrypt
 openai
+matplotlib
+numpy
+mcp
+yfinance

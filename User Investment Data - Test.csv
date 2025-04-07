@@ -1,0 +1,21 @@
+﻿Investment ID,User ID,Investment Type,Investment Name,Ticker Name,Amount Invested,Investment Date
+1,U001,Stock,Tesla Stock,TSLA,"5,000.00",2023-02-01
+2,U001,Mutual Fund,Vanguard Fund,N/A,"10,000.00",2023-05-15
+3,U001,Bonds,Singapore Bonds,N/A,"8,000.00",2022-10-10
+4,U002,ETF,S&P 500 ETF,SPY,"7,000.00",2022-03-01
+5,U002,Stock,Apple Stock,AAPL,"15,000.00",2021-09-01
+6,U003,Mutual Fund,Fidelity Growth Fund,N/A,"6,000.00",2023-04-20
+7,U003,Stock,Microsoft Stock,MSFT,"20,000.00",2022-12-12
+8,U004,Bonds,US Treasury Bond,N/A,"10,000.00",2023-06-01
+9,U004,ETF,Vanguard S&P ETF,VOO,"12,000.00",2021-01-01
+10,U005,Mutual Fund,BlackRock Fund,N/A,"25,000.00",2023-08-15
+11,U005,Stock,Amazon Stock,AMZN,"18,000.00",2022-11-10
+12,U006,ETF,iShares MSCI ETF,ACWI,"9,000.00",2023-07-25
+13,U006,Bonds,UK Government Bond,N/A,"12,000.00",2022-05-15
+14,U007,Mutual Fund,T. Rowe Price Fund,N/A,"8,500.00",2023-01-10
+15,U007,Stock,Alphabet Stock,GOOGL,"20,000.00",2021-10-12
+16,U008,Bonds,German Bund Bond,N/A,"7,000.00",2023-03-05
+17,U008,ETF,Vanguard Total Stock,VTI,"13,000.00",2021-12-01
+18,U009,Mutual Fund,Schwab Index Fund,SWTSX,"10,000.00",2023-09-18
+19,U009,Stock,Nvidia Stock,NVDA,"5,000.00",2023-02-20
+20,U010,ETF,Global X ETF,N/A,"11,000.00",2022-08-30
