@@ -41,7 +41,7 @@
                 <div class="chat-item {% if chat.chat_id == request.args.get('chat_id') %}active{% endif %}"
                     onclick="confirmAction(() => loadChat('{{ chat.chat_id }}'))">
                     <div class="chat-preview">{{ chat.chat_title }}</div>
-                    <small class="chat-time">{{ chat.created_at.strftime('%Y-%m-%d %H:%M') if chat.created_at else 'Just
+                    <small class="chat-time">{{ chat.created_at.strftime('%d/%m/%Y %H:%M') if chat.created_at else 'Just
                         now' }}</small>
                 </div>
                 {% endfor %}
