@@ -100,9 +100,10 @@
                                     const resultContent = document.createElement('pre');
                                     resultContent.className = 'tool-result-content';
                                     try {
-                                        const contentStr = `{{ msg.content|safe|replace("'", "\\'") }}`;
+                                        const contentStr = `{{ msg.content|tojson|safe|replace("'", "\\'") }}`;
 
                                         const cleanContent = contentStr
+                                            .substring(1, contentStr.length - 1)
                                             .replace(/\\n/g, "\\n")
                                             .replace(/\\'/g, "\\'")
                                             .replace(/\\"/g, '\\"')
