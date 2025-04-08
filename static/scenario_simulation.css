@@ -1,3 +1,46 @@
+/* General Page Styling */
+body.simulation-page {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f7fc;
+    color: #333;
+    height: auto !important;
+    overflow: auto !important;
+    display: block !important;
+}
+
+/* Header */
+.simulation-header {
+    background-color: #007BFF;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem 0;
+    width: 100% !important;
+    position: sticky !important;
+    z-index: 100 !important;
+    display: block !important;
+    top: 0 !important;
+}
+
+.simulation-header h1 {
+    text-align: center;
+    color: white;
+    font-size: 2rem;
+    padding: 0;
+    background-color: transparent !important;
+}
+
+.simulation-main {
+    padding: 2rem 1rem;
+    max-width: 1000px;
+    margin: 0 auto !important;
+    width: 100%;
+    box-sizing: border-box;
+    display: block !important;
+}
+
+/* General Page Styling */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     line-height: 1.6;
@@ -7,52 +50,28 @@ body {
     color: #333;
 }
 
+/* Header */
 header {
     background-color: #007BFF;
-    color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem 0;
+    width: 100%;
+    position: static; /* 恢复正常文档流定位 */
+    z-index: 10;
+}
+
+h1 {
     text-align: center;
-    padding: 2rem 1rem;
-    margin-bottom: 2rem;
-}
-
-header h1 {
-    margin: 0;
-    font-size: 2.2rem;
-}
-
-header p {
-    margin: 0.5rem 0 0;
-    font-size: 1.1rem;
-    opacity: 0.9;
+    color: white;
+    font-size: 2rem;
 }
 
 main {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 1rem;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 2rem;
-}
-
-section {
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    padding: 1.5rem;
-}
-
-#simulation-form {
-    flex: 1 1 400px;
-}
-
-#simulation-results {
-    flex: 2 1 600px;
-    display: none;
-}
-
-#simulation-results.show {
-    display: block;
+    padding: 2rem 1rem;
+    max-width: 1000px;
+    margin: 0 auto; /* 重置为标准居中外边距 */
+    width: 100%;
+    box-sizing: border-box;
 }
 
 h2 {
@@ -61,9 +80,23 @@ h2 {
 }
 
 form {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
     display: flex;
     flex-direction: column;
     gap: 1rem;
+}
+
+
+#simulation-results {
+    margin-top: 2rem;
+    display: none;
+}
+
+#simulation-results.show {
+    display: block;
 }
 
 .input-group {
@@ -91,7 +124,8 @@ input:focus, select:focus {
 }
 
 .cta-button {
-    margin-top: 1rem;
+    width: 100%;
+    margin: 0;
     padding: 0.75rem 1.5rem;
     background-color: #007BFF;
     color: white;
@@ -180,6 +214,40 @@ input:focus, select:focus {
     padding: 1rem;
 }
 
+/* Back Button Styles */
+.form-footer {
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #555;
+    text-decoration: none;
+    font-size: 1rem;
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    background-color: #f0f0f0;
+    transition: all 0.3s ease;
+}
+
+.back-link:hover {
+    background-color: #e0e0e0;
+    color: #007BFF;
+    transform: translateY(-2px);
+}
+
+.back-icon {
+    font-size: 1.1rem;
+}
+
+footer {
+    padding-left: 0;
+    padding-right: 0;
+}
+
 @keyframes spinner {
     to {
         transform: rotate(360deg);
@@ -197,5 +265,9 @@ input:focus, select:focus {
     
     .key-stats {
         flex-direction: column;
+    }
+    
+    .back-link {
+        font-size: 0.9rem;
     }
 }

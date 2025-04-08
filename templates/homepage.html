@@ -3,26 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+    <title>Home - AI-Powered Banking</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <header>
-        <h1>Welcome, {{ username }}!</h1>
+        <div class="header-container">
+            <h1>Welcome, {{ username }}！</h1>
+        </div>
     </header>
     <main>
-        <section id="introduction">
+        <section id="introduction" class="hero-section">
+            <div class="hero-icon">
+                <i class="fas fa-chart-line fa-3x"></i>
+            </div>
             <h2>Visualize Your Financial Future in Real-Time</h2>
-            <p>Our AI-powered Digital Twin allows you to simulate your financial future with real-time data integration and personalized insights.</p>
-            <p>Explore our key features to see how we can help you achieve your financial goals!</p>
+            <p class="hero-description">Our AI-powered Digital Twin allows you to simulate your financial future with real-time data integration and personalized insights.</p>
+            <div class="feature-highlight">
+                <div class="highlight-item">
+                    <i class="fas fa-robot"></i>
+                    <span>AI Analysis</span>
+                </div>
+                <div class="highlight-item">
+                    <i class="fas fa-sync-alt"></i>
+                    <span>Real-Time Update</span>
+                </div>
+            </div>
+            <p class="cta-text">Explore our key features to see how we can help you achieve your financial goals!</p>
         </section>
-        <nav>
-            <a href="{{ url_for('features') }}" class="cta-button">Features</a>
-            <a href="{{ url_for('more') }}" class="cta-button">More</a>
+        <nav class="main-navigation">
+            <a href="{{ url_for('features') }}" class="cta-button">
+                <i class="fas fa-star"></i> Features
+            </a>
+            <a href="{{ url_for('more') }}" class="cta-button">
+                <i class="fas fa-cog"></i> More Options
+            </a>
         </nav>
     </main>
     <footer>
-        <p>&copy; 2025 AI-Powered Banking. All rights reserved.</p>
+        <div class="footer-content">
+            <p>&copy; 2025 AI-Powered Banking. All rights reserved.</p>
+        </div>
     </footer>
 </body>
 </html>

@@ -29,13 +29,20 @@ document.addEventListener("DOMContentLoaded", function () {
                 recommendationDiv.innerHTML = `<p style="color:red;">${result.error}</p>`;
             } else {
                 recommendationDiv.innerHTML = `
-                    <h3>AI Recommendations</h3>
-                    <p><strong>Investment Strategy:</strong> ${result.investment_strategy}</p>
-                    <p><strong>Optimal Savings Plan:</strong> ${result.savings_plan}</p>
-                    <p><strong>Debt Repayment Strategy:</strong> ${result.debt_strategy}</p>
-                    <p><strong>Projected Growth:</strong> SGD ${result.projected_growth}</p>
+                    <div class="recommendation-header">
+                        <i class="fas fa-lightbulb"></i>
+                        <h3>AI Recommendations</h3>
+                    </div>
+                    <div class="recommendation-content">
+                        <p><i class="fas fa-chart-pie"></i> <strong>Investment Strategy:</strong> ${result.investment_strategy}</p>
+                        <p><i class="fas fa-piggy-bank"></i> <strong>Optimal Savings Plan:</strong> ${result.savings_plan}</p>
+                        <p><i class="fas fa-hand-holding-usd"></i> <strong>Debt Repayment Strategy:</strong> ${result.debt_strategy}</p>
+                        <p><i class="fas fa-chart-line"></i> <strong>Projected Growth:</strong> SGD ${result.projected_growth}</p>
+                    </div>
                 `;
             }
+            recommendationDiv.style.display = "block";
+            recommendationDiv.scrollIntoView({ behavior: "smooth" });
         } catch (error) {
             recommendationDiv.innerHTML = `<p style="color:red;">Error fetching recommendations. Try again.</p>`;
             console.error("Fetch error:", error);

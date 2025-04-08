@@ -737,23 +737,7 @@ def ai_chatbot():
         if not messages:
             return redirect(url_for("ai_chatbot"))
 
-        history = []
-        for msg in messages:
-            msg_data = json.loads(msg.message)
-            
-            if msg_data.get('role') == 'tool':
-                try:
-                    content = msg_data.get('content', '')
-                    if isinstance(content, str):
-                        try:
-                            content_obj = json.loads(content)
-                            msg_data['content'] = json.dumps(content_obj)
-                        except json.JSONDecodeError:
-                            pass
-                except Exception as e:
-                    logging.error(f"Error processing tool result: {e}")
-            
-            history.append(msg_data)
+        history = [json.loads(msg.message) for msg in messages]
     else:
         history = []
 

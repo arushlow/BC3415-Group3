@@ -39,11 +39,9 @@ async def get_income_statements(
         if not data:
             return "Unable to fetch income statements or no income statements found."
 
-        # Check if limit is specified and filter the data
-        if limit and limit < len(data):
-            sorted_dates = sorted(data.keys(), reverse=True)
-            limited_data = {date: data[date] for date in sorted_dates[:limit]}
-            data = limited_data
+        sorted_dates = sorted(data.keys(), reverse=True)
+        limited_data = {str(date): data[date] for date in sorted_dates[:limit]}
+        data = limited_data
 
         # Stringify the income statements
         return json.dumps(data, indent=2)
@@ -55,7 +53,7 @@ async def get_income_statements(
 @mcp.tool()
 async def get_balance_sheets(
     ticker: str,
-    period: str = "annual",
+    period: str = "yearly",
     limit: int = 4,
 ) -> str:
     """Get balance sheets for a company.
@@ -67,19 +65,15 @@ async def get_balance_sheets(
     """
     try:
         # Fetch data
-        data = yf.Ticker(ticker).get_balance_sheet(
-            freq=period, pretty=True, as_dict=True
-        )
+        data = yf.Ticker(ticker).get_balance_sheet(freq=period, pretty=True, as_dict=True)
 
         # Check if data is found
         if not data:
             return "Unable to fetch balance sheets or no balance sheets found."
 
-        # Check if limit is specified and filter the data
-        if limit and limit < len(data):
-            sorted_dates = sorted(data.keys(), reverse=True)
-            limited_data = {date: data[date] for date in sorted_dates[:limit]}
-            data = limited_data
+        sorted_dates = sorted(data.keys(), reverse=True)
+        limited_data = {str(date): data[date] for date in sorted_dates[:limit]}
+        data = limited_data
 
         # Stringify the balance sheets
         return json.dumps(data, indent=2)
@@ -91,7 +85,7 @@ async def get_balance_sheets(
 @mcp.tool()
 async def get_cash_flow_statements(
     ticker: str,
-    period: str = "annual",
+    period: str = "yearly",
     limit: int = 4,
 ) -> str:
     """Get cash flow statements for a company.
@@ -111,11 +105,9 @@ async def get_cash_flow_statements(
                 "Unable to fetch cash flow statements or no cash flow statements found."
             )
 
-        # Check if limit is specified and filter the data
-        if limit and limit < len(data):
-            sorted_dates = sorted(data.keys(), reverse=True)
-            limited_data = {date: data[date] for date in sorted_dates[:limit]}
-            data = limited_data
+        sorted_dates = sorted(data.keys(), reverse=True)
+        limited_data = {str(date): data[date] for date in sorted_dates[:limit]}
+        data = limited_data
 
         # Stringify the cash flow statements
         return json.dumps(data, indent=2)

@@ -28,10 +28,10 @@
             <div class="sidebar-header">
                 <h2>History Conversations</h2>
                 <div class="sidebar-buttons">
-                    <button id="clear-history-btn" onclick="clearHistory()" title="Clear History">
+                    <button id="clear-history-btn" onclick="confirmAction(clearHistory)" title="Clear History">
                         <span class="material-symbols-outlined">delete</span>
                     </button>
-                    <button id="sidebar-new-chat-btn" onclick="newChat()" title="New Chat">
+                    <button id="sidebar-new-chat-btn" onclick="confirmAction(newChat)" title="New Chat">
                         <span class="material-symbols-outlined">add_comment</span>
                     </button>
                 </div>
@@ -39,7 +39,7 @@
             <div class="chat-list">
                 {% for chat in chats %}
                 <div class="chat-item {% if chat.chat_id == request.args.get('chat_id') %}active{% endif %}"
-                    onclick="loadChat('{{ chat.chat_id }}')">
+                    onclick="confirmAction(() => loadChat('{{ chat.chat_id }}'))">
                     <div class="chat-preview">{{ chat.chat_title }}</div>
                     <small class="chat-time">{{ chat.created_at.strftime('%Y-%m-%d %H:%M') if chat.created_at else 'Just
                         now' }}</small>
@@ -54,7 +54,7 @@
         <div class="main-content">
             <header>
                 <div class="header-content">
-                    <button id="back-button" onclick="window.location.href='{{ url_for('features') }}'"
+                    <button id="back-button" onclick="confirmAction(() => window.location.href='{{ url_for('features') }}')"
                         title="Back to Features">
                         <span class="material-symbols-outlined">arrow_back</span>
                     </button>
@@ -160,7 +160,7 @@
 
             <footer>
                 <div id="input-area">
-                    <button id="new-conversation-btn" title="New Conversation" onclick="newChat()">
+                    <button id="new-conversation-btn" title="New Conversation" onclick="confirmAction(newChat)">
                         <span class="material-symbols-outlined">
                             add_comment
                         </span>
@@ -182,6 +182,25 @@
         let activeToolCalls = {};
         let lastSentMessage = '';
         let messageToolCalls = {};
+        let isProcessingMessage = false;
+
+        window.addEventListener('beforeunload', function(e) {
+            if (isProcessingMessage) {
+                e.preventDefault();
+                e.returnValue = 'This chat is not completed and will be lost if you leave. Continue?';
+                return e.returnValue;
+            }
+        });
+
+        function confirmAction(actionFn) {
+            if (isProcessingMessage) {
+                if (confirm('This chat is not completed and will be lost if you leave. Continue?')) {
+                    actionFn();
+                }
+            } else {
+                actionFn();
+            }
+        }
 
         marked.setOptions({
             highlight: function (code, language) {
@@ -222,8 +241,16 @@
                 }
             });
 
-            chatBox.scrollTop = chatBox.scrollHeight;
+            scrollToBottom();
         });
+
+        function scrollToBottom(delay = 0) {
+            setTimeout(() => {
+                if (chatBox) {
+                    chatBox.scrollTop = chatBox.scrollHeight;
+                }
+            }, delay);
+        }
 
         function renderMarkdown(text) {
             return marked.parse(text);
@@ -241,16 +268,14 @@
             const contentDiv = document.createElement('div');
             contentDiv.className = 'message-content';
 
-            if (role === 'user') {
-                contentDiv.textContent = content;
-            } else {
-                contentDiv.textContent = content;
-            }
+            const contentP = document.createElement('p');
+            contentP.textContent = content;
+            contentDiv.appendChild(contentP);
 
             div.appendChild(contentDiv);
             if (id) div.dataset.tempId = id;
             chatBox.appendChild(div);
-            chatBox.scrollTop = chatBox.scrollHeight;
+            scrollToBottom();
 
             return contentDiv;
         }
@@ -264,6 +289,7 @@
                 } else {
                     contentDiv.textContent = content;
                 }
+                scrollToBottom();
             }
         }
 
@@ -323,6 +349,8 @@
             messageToolCalls[messageId].push(toolDiv);
 
             messageContentDiv.dataset.hasTools = 'true';
+            
+            scrollToBottom();
 
             return {
                 container: toolContainer,
@@ -356,22 +384,25 @@
                 toolCall.arguments += content;
                 const argsElement = toolCall.elements.argsPre;
                 toolCall.elements.argsPre.parentElement.style.display = 'block';
-                toolCall.elements.loadingDiv.style.display = 'none';
-
+                
                 try {
                     if (toolCall.arguments.trim().endsWith('}')) {
                         const formattedArgs = JSON.stringify(JSON.parse(toolCall.arguments), null, 2);
                         argsElement.textContent = formattedArgs;
+                        toolCall.elements.loadingDiv.textContent = 'Executing tool...';
+                        toolCall.elements.loadingDiv.style.display = 'block';
                     } else {
                         argsElement.textContent = toolCall.arguments;
+                        toolCall.elements.loadingDiv.style.display = 'block';
                     }
                     argsElement.style.display = 'block';
                 } catch (e) {
                     argsElement.textContent = toolCall.arguments;
                     argsElement.style.display = 'block';
+                    toolCall.elements.loadingDiv.style.display = 'block';
                 }
-
-                toolCall.elements.loadingDiv.textContent = 'Executing tool...';
+                
+                scrollToBottom();
             }
         }
 
@@ -431,11 +462,11 @@
             }
 
             delete activeToolCalls[id];
+            scrollToBottom();
         }
 
         function retryLastMessage() {
             if (lastSentMessage) {
-
                 const retryMessages = document.querySelectorAll('.retry-message');
                 retryMessages.forEach(message => {
                     message.remove();
@@ -472,6 +503,7 @@
             if (!message) return;
 
             lastSentMessage = message;
+            isProcessingMessage = true;
 
             input.disabled = true;
             document.querySelector('#send-btn').disabled = true;
@@ -486,6 +518,8 @@
             const messageContentDiv = appendMessage('assistant', '▌', tempId);
             
             messageToolCalls[tempId] = [];
+            
+            scrollToBottom();
 
             const formData = new FormData();
             formData.append('message', message);
@@ -509,12 +543,12 @@
                 const target = document.querySelector(`[data-temp-id="${tempId}"]`);
                 if (target) {
                     const contentDiv = target.querySelector('.message-content');
-                    contentDiv.appendChild(document.createElement('br'));
                     contentDiv.appendChild(retryButton);
                 }
 
                 input.disabled = false;
                 document.querySelector('#send-btn').disabled = false;
+                isProcessingMessage = false;
                 input.focus();
             }, 30000);
 
@@ -536,9 +570,7 @@
                         if (done) {
                             if (assistantContent) {
                                 if (messageContentDiv.dataset.hasTools === 'true') {
-
-                                    const textNode = document.createTextNode(assistantContent);
-                                    messageContentDiv.appendChild(textNode);
+                                    messageContentDiv.innerHTML = messageContentDiv.innerHTML.replace('▌', '');
                                 } else {
                                     updateMessage(tempId, assistantContent);
                                 }
@@ -559,12 +591,10 @@
                                 const target = document.querySelector(`[data-temp-id="${tempId}"]`);
                                 if (target) {
                                     const contentDiv = target.querySelector('.message-content');
-                                    contentDiv.appendChild(document.createElement('br'));
                                     contentDiv.appendChild(retryButton);
                                 }
                             }
                             
-                            cleanupMessageToolCalls(tempId);
                             return;
                         }
 
@@ -580,12 +610,16 @@
                                         assistantContent += data.data;
 
                                         if (messageContentDiv.dataset.hasTools === 'true') {
-                                            messageContentDiv.innerHTML = messageContentDiv.innerHTML.replace('▌', '');
-
-                                            messageContentDiv.appendChild(document.createTextNode(data.data + '▌'));
+                                            messageContentDiv.innerHTML = '';
+                                            if (assistantContent.trim()) {
+                                                messageContentDiv.appendChild(document.createTextNode(assistantContent + '▌'));
+                                            } else {
+                                                messageContentDiv.appendChild(document.createTextNode('▌'));
+                                            }
                                         } else {
                                             updateMessage(tempId, assistantContent + '▌');
                                         }
+                                        scrollToBottom();
                                         break;
                                     case 'chat_id':
                                         chatId = data.data;
@@ -618,7 +652,6 @@
                                                 retryButton.onclick = function () {
                                                     retryLastMessage();
                                                 };
-                                                messageContentDiv.appendChild(document.createElement('br'));
                                                 messageContentDiv.appendChild(retryButton);
                                             } else {
                                                 assistantContent += errorMsg;
@@ -638,7 +671,6 @@
                                                 const target = document.querySelector(`[data-temp-id="${tempId}"]`);
                                                 if (target) {
                                                     const contentDiv = target.querySelector('.message-content');
-                                                    contentDiv.appendChild(document.createElement('br'));
                                                     contentDiv.appendChild(retryButton);
                                                 }
                                             }
@@ -661,7 +693,6 @@
                                     retryButton.onclick = function () {
                                         retryLastMessage();
                                     };
-                                    messageContentDiv.appendChild(document.createElement('br'));
                                     messageContentDiv.appendChild(retryButton);
                                 } else {
                                     assistantContent += errorMsg;
@@ -670,7 +701,6 @@
                                     const target = document.querySelector(`[data-temp-id="${tempId}"]`);
                                     if (target) {
                                         const contentDiv = target.querySelector('.message-content');
-                                        contentDiv.appendChild(document.createElement('br'));
 
                                         const retryButton = document.createElement('button');
                                         retryButton.className = 'retry-button';
@@ -687,7 +717,7 @@
                             }
                         }
 
-                        chatBox.scrollTop = chatBox.scrollHeight;
+                        scrollToBottom(100);
 
                         return push();
                     }).catch(error => {
@@ -703,7 +733,6 @@
                             retryButton.onclick = function () {
                                 retryLastMessage();
                             };
-                            messageContentDiv.appendChild(document.createElement('br'));
                             messageContentDiv.appendChild(retryButton);
                         } else {
                             updateMessage(tempId, assistantContent + errorMsg);
@@ -711,7 +740,6 @@
                             const target = document.querySelector(`[data-temp-id="${tempId}"]`);
                             if (target) {
                                 const contentDiv = target.querySelector('.message-content');
-                                contentDiv.appendChild(document.createElement('br'));
 
                                 const retryButton = document.createElement('button');
                                 retryButton.className = 'retry-button';
@@ -736,7 +764,6 @@
                 const target = document.querySelector(`[data-temp-id="${tempId}"]`);
                 if (target) {
                     const contentDiv = target.querySelector('.message-content');
-                    contentDiv.appendChild(document.createElement('br'));
 
                     const retryButton = document.createElement('button');
                     retryButton.className = 'retry-button';
@@ -748,15 +775,24 @@
 
                     contentDiv.appendChild(retryButton);
                 }
+                isProcessingMessage = false;
             }).finally(() => {
                 clearTimeout(fetchTimeout);
                 input.disabled = false;
                 document.querySelector('#send-btn').disabled = false;
+                isProcessingMessage = false;
                 input.focus();
 
                 if (messageContentDiv.dataset.hasTools === 'true') {
-                    messageContentDiv.innerHTML = messageContentDiv.innerHTML.replace('▌', '');
+                    if (messageContentDiv.innerHTML.includes('▌')) {
+                        messageContentDiv.innerHTML = messageContentDiv.innerHTML.replace('▌', '');
+                    }
+                    
+                    if (assistantContent.trim() === '') {
+                        messageContentDiv.innerHTML = '';
+                    }
                 }
+                scrollToBottom(200);
             });
         }
 
@@ -774,7 +810,7 @@
                 <div class="chat-preview">${firstMessage.substring(0, 32)}${firstMessage.length > 32 ? '...' : ''}</div>
                 <small class="chat-time">Just now</small>
             `;
-            div.onclick = () => loadChat(id);
+            div.onclick = () => confirmAction(() => loadChat(id));
             sidebar.insertBefore(div, sidebar.firstChild);
         }
 

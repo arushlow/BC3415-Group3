@@ -11,10 +11,23 @@
         <h1>Change Login Information</h1>
     </header>
     <main>
-        <nav>
-            <a href="{{ url_for('change_username') }}" class="cta-button">Change Username</a>
-            <a href="{{ url_for('change_password') }}" class="cta-button">Change Password</a>
-        </nav>
+        <div class="form-container">
+            <div class="options-menu">
+                <a href="{{ url_for('change_username') }}" class="menu-button">
+                    <span class="icon">👤</span>
+                    <span class="label">Change Username</span>
+                </a>
+                <a href="{{ url_for('change_password') }}" class="menu-button">
+                    <span class="icon">🔑</span>
+                    <span class="label">Change Password</span>
+                </a>
+            </div>
+            <div class="form-footer">
+                <a href="{{ url_for('more') }}" class="back-link">
+                    <span class="back-icon">←</span> Return to More Options
+                </a>
+            </div>
+        </div>
     </main>
 
     <footer>

@@ -5,17 +5,49 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI-Powered Banking</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <header>
+    <header class="welcome-header">
+        <div class="logo-container">
+            <i class="fas fa-university logo-icon"></i>
+            <span class="logo-text">AI-Powered Banking</span>
+        </div>
         <h1>Visualize Your Financial Future in Real-Time</h1>
     </header>
     <main>
-        <section id="introduction">
-            <h2>Welcome to Our AI-Powered Platform</h2>
-            <p>Our AI-powered Digital Twin allows you to simulate your financial future with real-time data integration and personalized insights.</p>
-            <a href="/login" class="cta-button">Log In</a>  <!-- Moved Log In button here -->
-            <a href="/signup" class="cta-button">Sign Up</a> <!-- Moved Sign Up button here -->
+        <section id="introduction" class="welcome-content">
+            <div class="welcome-card">
+                <div class="card-icon">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h2>Welcome to Our AI-Powered Platform</h2>
+                <p class="welcome-description">Our AI-powered Digital Twin allows you to simulate your financial future with real-time data integration and personalized insights.</p>
+                
+                <div class="features-preview">
+                    <div class="feature-item">
+                        <i class="fas fa-chart-pie"></i>
+                        <span>Intelligent Analytics</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-calculator"></i>
+                        <span>Financial Planning</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-lightbulb"></i>
+                        <span>Personalized Insights</span>
+                    </div>
+                </div>
+                
+                <div class="welcome-buttons">
+                    <a href="/login" class="cta-button login-btn">
+                        <i class="fas fa-sign-in-alt"></i> Log In
+                    </a>
+                    <a href="/signup" class="cta-button signup-btn">
+                        <i class="fas fa-user-plus"></i> Sign Up
+                    </a>
+                </div>
+            </div>
         </section>
     </main>
     <footer>
