@@ -908,7 +908,15 @@ def invest_details(ticker):
     response = requests.get(url)
     stock = response.json()
     data = stock[0]
-    return render_template("invest_info.html", account=account, stock=data)
+    
+    change = {}
+    for tick in account:
+        changing = {}
+        changing['growth'] = round(((data['price'] - float(tick.price))/float(tick.price))*100, 2)
+        changing['increase'] = round((data['price'] - float(tick.price)) * tick.quantity, 2)
+        changing['current'] = round(data['price'] * tick.quantity, 2)
+        change[tick.date] = changing
+    return render_template("invest_info.html", account=account, stock=data, change=change)
 
 
 @app.route("/data")

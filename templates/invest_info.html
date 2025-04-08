@@ -8,10 +8,29 @@
 </head>
 
 <body>
-    <h1>Account Transactions</h1>  
+    <h1>Account Transactions</h1> 
+    
     <table>
         <tr>
-            <td>Account Overview</td>
+            <td>Current Account Overview</td>
+        </tr>
+        <tr>
+            <td>Investment Growth %</td>
+            <td>Investment Change</td>
+            <td>Current Investment Worth</td>
+        </tr>
+        {% for invest in account %}
+        <tr>
+            <td><h1><strong>{{change[invest.date]['growth']}}%</strong></h1></td>
+            <td><h1><strong>${{change[invest.date]['increase']}}</strong></h1></td>
+            <td><h1><strong>${{change[invest.date]['current']}}</strong></h1></td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <table>
+        <tr>
+            <td>Original Account Overview</td>
         </tr>
         <tr>
             <td>Investment Type</td>
@@ -29,7 +48,8 @@
             <td>{{invest.date}}</td>
         </tr>
         {% endfor %}
-
+    </table>
+    <table>
         <h2>Overview of Investment</h2>
         <h3>Name: {{stock['companyName']}}</h3>
         <h3>Symbol: {{stock['symbol']}}</h3>
