@@ -1,4 +1,46 @@
 /* General Page Styling */
+body.adjustments-page {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f7fc;
+    color: #333;
+    height: auto !important;
+    overflow: auto !important;
+    display: block !important;
+}
+
+/* Header */
+.adjustments-header {
+    background-color: #007BFF;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem 0;
+    width: 100% !important;
+    position: sticky !important;
+    z-index: 100 !important;
+    display: block !important;
+    top: 0 !important;
+}
+
+.adjustments-header h1 {
+    text-align: center;
+    color: white;
+    font-size: 2rem;
+    padding: 0;
+    background-color: transparent !important;
+}
+
+.adjustments-main {
+    padding: 2rem 1rem;
+    max-width: 1000px;
+    margin: 0 auto !important;
+    width: 100%;
+    box-sizing: border-box;
+    display: block !important;
+}
+
+/* General Page Styling */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     line-height: 1.6;
@@ -9,23 +51,62 @@ body {
 }
 
 /* Header */
+header {
+    background-color: #007BFF;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem 0;
+    width: 100%;
+    position: static; /* 恢复正常文档流定位 */
+    z-index: 10;
+}
+
 h1 {
     text-align: center;
-    background-color: #007BFF;
     color: white;
+    font-size: 2rem;
+}
+
+main {
     padding: 2rem 1rem;
-    margin-bottom: 2rem;
-    font-size: 2.2rem;
+    max-width: 1000px;
+    margin: 0 auto; /* 重置为标准居中外边距 */
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.page-description {
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto 2rem;
+    color: #555;
+    font-size: 1.1rem;
 }
 
 /* Form Section */
 #preferences-form {
     max-width: 600px;
     background-color: white;
-    margin: 0 auto;
-    padding: 1.5rem;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin: 0 auto 2rem;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.form-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    gap: 10px;
+    color: #007BFF;
+}
+
+.form-header i {
+    font-size: 1.5rem;
+}
+
+.form-header h2 {
+    margin: 0;
+    font-size: 1.6rem;
 }
 
 /* Form Elements */
@@ -33,61 +114,178 @@ h1 {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
 }
 
 label {
     font-weight: 600;
     color: #555;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+label i {
+    color: #007BFF;
+    width: 20px;
 }
 
 input, select {
-    padding: 0.75rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    padding: 0.9rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
     font-size: 1rem;
-    transition: border-color 0.3s ease-in-out;
+    transition: all 0.3s ease;
+    background-color: #f9f9f9;
 }
 
 input:focus, select:focus {
     border-color: #007BFF;
     outline: none;
-    box-shadow: 0 0 0 2px rgba(0, 102, 178, 0.2);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+    background-color: #fff;
+}
+
+input::placeholder {
+    color: #aaa;
 }
 
 /* Submit Button */
 .cta-button {
     width: 100%;
-    padding: 0.75rem;
+    margin: 0;
+    padding: 1rem;
     background-color: #007BFF;
     color: white;
     border: none;
-    border-radius: 4px;
-    font-size: 1rem;
+    border-radius: 8px;
+    font-size: 1.1rem;
     cursor: pointer;
-    transition: background-color 0.2s, transform 0.2s;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-weight: 600;
 }
 
 .cta-button:hover {
     background-color: #0055a4;
-    transform: scale(1.03);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 123, 255, 0.2);
+}
+
+.cta-button i {
+    font-size: 1.2rem;
 }
 
 /* Recommendation Summary */
 #recommendation-summary {
     max-width: 600px;
-    margin: 2rem auto;
-    background-color: #e9f7ef;
-    border-left: 4px solid #28a745;
-    padding: 1rem;
+    margin: 0 auto 2rem;
+    background-color: #fff;
+    padding: 2rem;
     font-size: 1rem;
-    border-radius: 4px;
-    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.recommendation-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    gap: 10px;
+    color: #28a745;
+}
+
+.recommendation-header i {
+    font-size: 1.5rem;
+}
+
+.recommendation-header h3 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.recommendation-content p {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0.8rem;
+    margin: 0.5rem 0;
+    border-radius: 8px;
+    background-color: #f8f9fa;
+    transition: all 0.3s ease;
+}
+
+.recommendation-content p:hover {
+    background-color: #e9f7ef;
+    transform: translateX(5px);
+}
+
+.recommendation-content i {
+    color: #28a745;
+}
+
+/* Back Button */
+.form-footer {
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #555;
+    text-decoration: none;
+    font-size: 1rem;
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    background-color: #f0f0f0;
+    transition: all 0.3s ease;
+}
+
+.back-link:hover {
+    background-color: #e0e0e0;
+    color: #007BFF;
+    transform: translateY(-2px);
+}
+
+.back-link i {
+    font-size: 0.9rem;
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    padding-left: 0;
+    padding-right: 0;
+    background-color: #333;
+    color: white;
+    margin-top: 3rem;
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
     #preferences-form, #recommendation-summary {
         width: 90%;
+        padding: 1.5rem;
+    }
+    
+    h1 {
+        font-size: 1.6rem;
+    }
+    
+    .form-header h2, .recommendation-header h3 {
+        font-size: 1.3rem;
+    }
+    
+    .page-description {
+        font-size: 1rem;
+    }
+    
+    .back-link {
+        font-size: 0.9rem;
     }
 }

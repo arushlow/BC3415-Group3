@@ -7,52 +7,74 @@
     <script defer src="{{ url_for('static', filename='AI-Generated_Adjustments.js') }}"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='AI-Generated_Adjustments.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
 </head>
-<body>
-    <h1>AI-Generated Financial Adjustments</h1>
-    <form id="preferences-form">
-        <div class="input-group">
-            <label for="income">Monthly Income (SGD)</label>
-            <input type="number" id="income" name="income" required>
-        </div>
-
-        <div class="input-group">
-            <label for="expenses">Monthly Expenses (SGD)</label>
-            <input type="number" id="expenses" name="expenses" required>
-        </div>
-
-        <div class="input-group">
-            <label for="savings">Current Savings (SGD)</label>
-            <input type="number" id="savings" name="savings" required>
-        </div>
-
-        <div class="input-group">
-            <label for="investments">Current Investments (SGD)</label>
-            <input type="number" id="investments" name="investments" required>
-        </div>
-
-        <div class="input-group">
-            <label for="debt">Total Debt (SGD)</label>
-            <input type="number" id="debt" name="debt" required>
-        </div>
-
-        <div class="input-group">
-            <label for="risk-tolerance">Risk Tolerance</label>
-            <select id="risk-tolerance" name="risk-tolerance">
-                <option value="low">Low</option>
-                <option value="medium">Medium</option>
-                <option value="high">High</option>
-            </select>
-        </div>
-
-        <button type="submit" class="cta-button">Get AI Suggestions</button>
-    </form>
-
-    <div id="recommendation-summary">
-        <h3>AI Recommendations</h3>
-        <p><strong>Investment Strategy:</strong> {{ investment_strategy }}</p>
-        <p><strong>Optimal Savings Plan:</strong> {{ savings_plan }}</p>
-        <p><strong>Debt Repayment Strategy:</strong> {{ debt_strategy }}</p>
-        <p><strong>Projected Growth:</strong> SGD {{ projected_growth }}</p>
-    </div>
+<body class="adjustments-page">
+    <header class="adjustments-header">
+        <h1>AI-Generated Financial Adjustments</h1>
+    </header>
     
+    <main class="adjustments-main">
+        <div class="page-description">
+            <p>Fill in your financial details below to receive personalized AI recommendations for optimizing your finances.</p>
+        </div>
+        
+        <form id="preferences-form">
+            <div class="form-header">
+                <i class="fas fa-coins"></i>
+                <h2>Your Financial Profile</h2>
+            </div>
+            
+            <div class="input-group">
+                <label for="income"><i class="fas fa-wallet"></i> Monthly Income (SGD)</label>
+                <input type="number" id="income" name="income" placeholder="Enter your monthly income" required>
+            </div>
+
+            <div class="input-group">
+                <label for="expenses"><i class="fas fa-shopping-cart"></i> Monthly Expenses (SGD)</label>
+                <input type="number" id="expenses" name="expenses" placeholder="Enter your monthly expenses" required>
+            </div>
+
+            <div class="input-group">
+                <label for="savings"><i class="fas fa-piggy-bank"></i> Current Savings (SGD)</label>
+                <input type="number" id="savings" name="savings" placeholder="Enter your current savings" required>
+            </div>
+
+            <div class="input-group">
+                <label for="investments"><i class="fas fa-chart-line"></i> Current Investments (SGD)</label>
+                <input type="number" id="investments" name="investments" placeholder="Enter your current investments" required>
+            </div>
+
+            <div class="input-group">
+                <label for="debt"><i class="fas fa-credit-card"></i> Total Debt (SGD)</label>
+                <input type="number" id="debt" name="debt" placeholder="Enter your total debt" required>
+            </div>
+
+            <div class="input-group">
+                <label for="risk-tolerance"><i class="fas fa-shield-alt"></i> Risk Tolerance</label>
+                <select id="risk-tolerance" name="risk-tolerance">
+                    <option value="low">Low - Safety First</option>
+                    <option value="medium">Medium - Balanced Approach</option>
+                    <option value="high">High - Growth Focused</option>
+                </select>
+            </div>
+
+            <button type="submit" class="cta-button"><i class="fas fa-magic"></i> Get AI Suggestions</button>
+        </form>
+
+        <div id="recommendation-summary" style="display: none;">
+        </div>
+        
+        <div class="form-footer">
+            <a href="{{ url_for('features') }}" class="back-link">
+                <i class="fas fa-arrow-left"></i> Return to Features
+            </a>
+        </div>
+    </main>
+    
+    <footer>
+        <p>&copy; 2025 AI-Powered Banking. All rights reserved.</p>
+    </footer>
+</body>
+</html>
+

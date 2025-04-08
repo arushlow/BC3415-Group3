@@ -3,19 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Features</title>
+    <title>Features - AI-Powered Banking</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    <h1>Features</h1>
-    <h2>Key Features:</h2>
-    <div class="cta-buttons">
-        <a href="{{ url_for('dashboard') }}" class="cta-button">Dashboard</a>
-        <a href="{{ url_for('data') }}" class="cta-button">Import Financial Data</a>
-        <a href="{{ url_for('scenario_simulation') }}" class="cta-button">Scenario Simulation</a>
-        <a href="{{ url_for('ai_generated_adjustments') }}" class="cta-button">AI-Generated Adjustments</a>
-        <a href="{{ url_for('ai_chatbot') }}" class="cta-button">AI Chatbot</a>
-    </div>
-    <a href="{{ url_for('home') }}" class="cta-button">Back to Homepage</a>
+    <header>
+        <h1>Features</h1>
+    </header>
+    <main>
+        <div class="features-container">
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3 class="feature-title">Dashboard</h3>
+                <p class="feature-description">Get a comprehensive view of your financial status with our interactive dashboard.</p>
+                <a href="{{ url_for('dashboard') }}" class="cta-button">Explore</a>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">📥</div>
+                <h3 class="feature-title">Import Financial Data</h3>
+                <p class="feature-description">Easily import and integrate your financial data from various sources.</p>
+                <a href="{{ url_for('data') }}" class="cta-button">Import</a>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🔮</div>
+                <h3 class="feature-title">Scenario Simulation</h3>
+                <p class="feature-description">Simulate different financial scenarios to better plan for your future.</p>
+                <a href="{{ url_for('scenario_simulation') }}" class="cta-button">Simulate</a>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🤖</div>
+                <h3 class="feature-title">AI-Generated Adjustments</h3>
+                <p class="feature-description">Receive personalized financial adjustments powered by advanced AI.</p>
+                <a href="{{ url_for('ai_generated_adjustments') }}" class="cta-button">Optimize</a>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">💬</div>
+                <h3 class="feature-title">AI Chatbot</h3>
+                <p class="feature-description">Get instant answers to your financial questions with our AI assistant.</p>
+                <a href="{{ url_for('ai_chatbot') }}" class="cta-button">Chat Now</a>
+            </div>
+        </div>
+        
+        <div class="form-footer">
+            <a href="{{ url_for('home') }}" class="back-link">
+                <span class="back-icon">←</span> Return to Homepage
+            </a>
+        </div>
+    </main>
+    
+    <footer>
+        <p>&copy; 2025 AI-Powered Banking. All rights reserved.</p>
+    </footer>
 </body>
 </html>

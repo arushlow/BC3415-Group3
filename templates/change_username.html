@@ -11,13 +11,21 @@
         <h1>Change Username</h1>
     </header>
     <main>
-        <p class="error">{{ error }}</p>
-        <form action="{{ url_for('change_username') }}" method="POST">
-            <label for="new_username">New Username:</label>
-            <input type="text" id="new_username" name="new_username" required>
-            <button type="submit" class="cta-button">Update Username</button>
-        </form>
-        <a href="{{ url_for('change_login_info') }}" class="cta-button">Back</a>
+        <div class="form-container">
+            {% if error %}
+            <p class="error">{{ error }}</p>
+            {% endif %}
+            <form action="{{ url_for('change_username') }}" method="POST" class="login-form">
+                <div class="form-group">
+                    <label for="new_username">New Username:</label>
+                    <input type="text" id="new_username" name="new_username" required>
+                </div>
+                <button type="submit" class="cta-button" style="width: auto;">Update Username</button>
+            </form>
+            <div class="form-footer">
+                <a href="{{ url_for('change_login_info') }}" class="signup-link">Back to settings</a>
+            </div>
+        </div>
     </main>
     <footer>
         <p>&copy; 2025 AI-Powered Banking. All rights reserved.</p>

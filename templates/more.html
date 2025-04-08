@@ -11,10 +11,23 @@
         <h1>More Options</h1>
     </header>
     <main>
-        <nav>
-            <a href="{{ url_for('change_login_info') }}" class="cta-button">Change Login Information</a>
-            <a href="{{ url_for('logout') }}" class="cta-button logout-button">Logout</a>
-        </nav>
+        <div class="form-container">
+            <div class="options-menu">
+                <a href="{{ url_for('change_login_info') }}" class="menu-button">
+                    <span class="icon">👤</span>
+                    <span class="label">Change Login Information</span>
+                </a>
+                <a href="{{ url_for('logout') }}" class="menu-button logout-button">
+                    <span class="icon">🚪</span>
+                    <span class="label">Logout</span>
+                </a>
+            </div>
+            <div class="form-footer">
+                <a href="{{ url_for('home') }}" class="back-link">
+                    <span class="back-icon">←</span> Return to Homepage
+                </a>
+            </div>
+        </div>
     </main>
     
     <footer>
