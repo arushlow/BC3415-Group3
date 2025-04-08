@@ -10,6 +10,7 @@ import uuid
 from datetime import datetime
 from functools import wraps
 from io import BytesIO, StringIO
+import requests
 
 import matplotlib
 matplotlib.use('Agg')
@@ -785,8 +786,11 @@ def home():
 @app.route("/dashboard")
 @login_required
 def dashboard():
-    data_invest = DataInvestment.select().where(DataInvestment.user == session['username'])
-    data_overview = DataOverview.select().where(DataOverview.user == session['username'])
+    user = User.get(User.username == session["username"])
+    data_invest = DataInvestment.select().where(DataInvestment.user == user)
+    data_overview = DataOverview.select().where(DataOverview.user == user)
+    
+    
     timestamp1 = np.random.randint(1, 1000000)
     timestamp2 = np.random.randint(1, 1000000)
     invest_totals = {
@@ -807,7 +811,8 @@ def dashboard():
 @app.route("/view_overview")
 @login_required
 def view_overview():
-    overview = DataOverview.select().where(DataOverview.user == session["username"])
+    user = User.get(User.username == session["username"])
+    overview = DataOverview.select().where(DataOverview.user == user)
 
     fig, ax = plt.subplots(figsize=(10, 6))
     
@@ -824,18 +829,20 @@ def view_overview():
     
     for i, (bank, data) in enumerate(bank_accounts.items()):
         for j, (account, balance) in enumerate(data.items()):
-            ax.bar(index[i], balance, 0.8, bottom=bottom[i], label=f'{bank} Account', color=np.random.rand(3,))
+            ax.bar(index[i], balance, 0.8, bottom=bottom[i], label=f'{account}', color=np.random.rand(3,))
             bottom[i] += float(balance)
             ax.text(
                 index[i],
                 bottom[i] - float(balance) / 2,
-                f'{account}',
+                f'${balance}',
                 ha='center',
                 va='center',
                 color='white',
-                fontweight='bold'
+                fontweight='bold',
+                fontsize=7,
             )
             
+    ax.legend(title="Account Types")
     ax.set_ylabel('Total Balance')
     ax.set_title('Bank Account Balances Stacked by Bank')
     ax.set_xticks(index)
@@ -857,9 +864,10 @@ def view_overview():
 @app.route("/view_invest")
 @login_required
 def view_invest():
-    username = session['username']
+    user = User.get(User.username == session["username"])
     
-    data = DataInvestment.select().where(DataInvestment.user == username)
+    data = DataInvestment.select().where(DataInvestment.user == user)
+    
     invest_groups = {}
     for invest in data:
         invest_type = invest.invest_type
@@ -869,7 +877,7 @@ def view_invest():
         invest_groups[invest_type] += amount   
     fig = plt.figure(figsize=(8, 8))
     plt.pie(invest_groups.values(), labels=invest_groups.keys(), autopct='%1.1f%%', startangle=140)
-    plt.title(f'{username} Investment Distribution')
+    plt.title(f'{session["username"]} Investment Distribution')
     
     img = BytesIO()
     plt.savefig(img, format='png')
@@ -887,8 +895,20 @@ def view_invest():
 @app.route("/account/<int:account_id>")
 @login_required
 def account_details(account_id):
-    account = DataTransaction.select().where((DataTransaction.user == session["username"]) & (DataTransaction.bank_account_id == account_id))
+    user = User.get(User.username == session["username"])
+    account = DataTransaction.select().where((DataTransaction.user == user) & (DataTransaction.bank_account_id == account_id))
     return render_template("account_info.html", account=account)
+
+@app.route("/invest/<ticker>")
+@login_required
+def invest_details(ticker):
+    user = User.get(User.username == session["username"])
+    account = DataInvestment.select().where((DataInvestment.user == user) & (DataInvestment.ticker == ticker))
+    url = f"https://financialmodelingprep.com/stable/profile?symbol={ticker}&apikey={os.getenv('API_KEY')}"
+    response = requests.get(url)
+    stock = response.json()
+    data = stock[0]
+    return render_template("invest_info.html", account=account, stock=data)
 
 
 @app.route("/data")
@@ -1019,7 +1039,13 @@ def data_invest():
             logging.debug(f"CSV Headers: {csvreader.fieldnames}")
             
             for line in csvreader:
-                amount = float(line['Amount Invested'].replace(',', ''))
+                price = line['Price Bought']
+                price=float(price) if price != "N/A" else None
+                quantity=int(line['Quantity']) if line['Quantity'] != "N/A" else None
+                if price is not None or quantity is not None:
+                    amount = round(float(price*quantity), 2)
+                else:
+                    amount = round(float(line['Amount Invested'].replace(',', '')), 2)
                 existing = (
                     DataInvestment.select()
                     .where(
@@ -1039,6 +1065,8 @@ def data_invest():
                         name=line['Investment Name'],
                         ticker=line['Ticker Name'],
                         invest_type=line['Investment Type'],
+                        price=price,
+                        quantity=quantity,
                         amount=amount,
                         date=datetime.strptime(line['Investment Date'], '%Y-%m-%d').date(),
                     )
@@ -1061,4 +1089,4 @@ def page_not_found(e):
     return render_template("404.html"), 404
 
 if __name__ == "__main__":
-    app.run(debug=False, threaded=True)
+    app.run(debug=True, threaded=True)

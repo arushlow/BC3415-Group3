@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+</head>
+
+<body>
+    <h1>Account Transactions</h1>  
+    <table>
+        <tr>
+            <td>Account Overview</td>
+        </tr>
+        <tr>
+            <td>Investment Type</td>
+            <td>Price Bought</td>
+            <td>Quantity</td>
+            <td>Total Invested</td>
+            <td>Date Purchased</td>
+        </tr>
+        {% for invest in account %}
+        <tr>
+            <td>{{invest.invest_type}}</td>
+            <td>{{invest.price}}</td>
+            <td>{{invest.quantity}}</td>
+            <td>{{invest.amount}}</td>
+            <td>{{invest.date}}</td>
+        </tr>
+        {% endfor %}
+
+        <h2>Overview of Investment</h2>
+        <h3>Name: {{stock['companyName']}}</h3>
+        <h3>Symbol: {{stock['symbol']}}</h3>
+        <p>Sector: {{stock['sector']}}</p>
+        <p>Industry: {{stock['industry']}}</p>
+        <p>Website: {{stock['website']}}</p>
+        <p>Country: {{stock['country']}}</p>
+        <p>Currency: {{stock['currency']}}</p>
+        <p>Description: {{stock['symbol']}}</p>
+
+        <h2>Investment Data</h2>
+        <h3>Price: {{stock['price']}}</h3>
+        <h3>Market Cap: {{stock['marketCap']}}</h3>
+        <h3>Volume: {{stock['volume']}}</h3>
+        <p>Last Dividend: {{stock['lastDividend']}}</p>
+        <p>Range: {{stock['range']}}</p>
+        <p>Change: {{stock['change']}}</p>
+        <p>Change %: {{stock['changePercentage']}}</p>
+
+
+        
+
+    </table>
+
+</body>
+
+</html>

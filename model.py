@@ -69,6 +69,8 @@ class DataInvestment(BaseModel):
     name = CharField()
     ticker = CharField()
     invest_type = CharField()
+    price = DecimalField(decimal_places=2, null=True)
+    quantity = IntegerField(null=True)
     amount = DecimalField(decimal_places=2)
     date = DateField()
     

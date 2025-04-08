@@ -25,7 +25,7 @@
     
     <table>
         <tr>
-            <td>Account Overview</td>
+            <td>Investment Overview</td>
         </tr>
         <tr>
             <td>Bank Name</td>
@@ -36,7 +36,7 @@
         <tr>
             <td>{{bank.bank_name}}</td>
             <td><a href="{{ url_for('account_details', account_id=bank.account_id) }}">{{bank.account_type}}</a></td>
-            <td>{{bank.balance}}</td>
+            <td>${{'{:.2f}'.format(bank.balance)}}</td>
         </tr>
         {% endfor %}
     </table>
@@ -66,13 +66,13 @@
         {% if invest.invest_type == "Bonds" %}
         <tr>
             <td>{{invest.name}}</td>
-            <td>{{invest.amount}}</td>
+            <td>{{'{:.2f}'.format(invest.amount)}}</td>
             <td>{{invest.date}}</td>
         </tr>
         {% endif %}
         {% endfor %}
         <tr>
-            <td>Total: ${{invest_totals["Bonds"]}}</td>
+            <td>Total: ${{'{:.2f}'.format(invest_totals["Bonds"])}}</td>
         </tr>
     </table>
     <table>
@@ -87,14 +87,14 @@
         {% for invest in investment %}
         {% if invest.invest_type == "ETF" %}
         <tr>
-            <td>{{invest.name}}</td>
-            <td>{{invest.amount}}</td>
+            <td><a href="{{ url_for('invest_details', ticker=invest.ticker) }}">{{invest.name}}</a></td>
+            <td>{{'{:.2f}'.format(invest.amount)}}</td>
             <td>{{invest.date}}</td>
         </tr>
         {% endif %}
         {% endfor %}
         <tr>
-            <td>Total: ${{invest_totals["ETF"]}}</td>
+            <td>Total: ${{'{:.2f}'.format(invest_totals["ETF"])}}</td>
         </tr>
     </table>
     <table>
@@ -110,13 +110,13 @@
         {% if invest.invest_type == "Mutual Fund" %}
         <tr>
             <td>{{invest.name}}</td>
-            <td>{{invest.amount}}</td>
+            <td>{{'{:.2f}'.format(invest.amount)}}</td>
             <td>{{invest.date}}</td>
         </tr>
         {% endif %}
         {% endfor %}
         <tr>
-            <td>Total: ${{invest_totals["Mutual Fund"]}}</td>
+            <td>Total: ${{'{:.2f}'.format(invest_totals["Mutual Fund"])}}</td>
         </tr>
     </table>
     <table>
@@ -132,13 +132,13 @@
         {% if invest.invest_type == "Stock" %}
         <tr>
             <td>{{invest.name}}</td>
-            <td>{{invest.amount}}</td>
+            <td><a href="{{ url_for('invest_details', ticker=invest.ticker) }}">{{'{:.2f}'.format(invest.amount)}}</a></td>
             <td>{{invest.date}}</td>
         </tr>
         {% endif %}
         {% endfor %}
         <tr>
-            <td>Total: ${{invest_totals["Stock"]}}</td>
+            <td>Total: ${{'{:.2f}'.format(invest_totals["Stock"])}}</td>
         </tr>
     </table>
 
