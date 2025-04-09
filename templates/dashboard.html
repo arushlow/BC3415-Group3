@@ -4,144 +4,154 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
     <title>Dashboard</title>
 </head>
 
 <body>
-    <h1>Dashboard</h1>
+    <header class="dashboard-header">
+        <h1>Dashboard</h1>
+        <p>Learn how your current finances are being handled.</p>
+    </header>
 
-    <h2>Bank Account Balances Chart</h2>
-    
-    <!-- Button to load the bank chart -->
-    <form method="GET" action="{{ url_for('dashboard') }}">
-        <button type="submit" name="show_bank_chart" value="1">Load Bank Chart</button>
-    </form>
+    <main class="dashboard-main">
+        <div class="dashboard-overview">
+            <h2>Overview of Bank Accounts</h2>
+            <form method="GET" action="{{ url_for('dashboard') }}">
+                <button type="submit" name="show_bank_chart" value="1">Load Bank Chart</button>
+            </form>
 
-    {% if show_bank_chart %}
-        <div>
-            <img src="{{ url_for('view_overview') }}" alt="Account Balance Chart">
+            {% if show_bank_chart %}
+            <div>
+                <img src="{{ url_for('view_overview') }}" alt="Account Balance Chart">
+            </div>
+            {% endif %}
+
+            <table>
+                <tr>
+                    <td>Bank Name</td>
+                    <td>Account Type</td>
+                    <td>Balance</td>
+                </tr>
+                {% for bank in overview %}
+                <tr>
+                    <td>{{bank.bank_name}}</td>
+                    <td><a href="{{ url_for('account_details', account_id=bank.account_id) }}">{{bank.account_type}}</a>
+                    </td>
+                    <td>${{'{:.2f}'.format(bank.balance)}}</td>
+                </tr>
+                {% endfor %}
+            </table>
         </div>
-    {% endif %}
-    
-    <table>
-        <tr>
-            <td>Investment Overview</td>
-        </tr>
-        <tr>
-            <td>Bank Name</td>
-            <td>Account Type</td>
-            <td>Balance</td>
-        </tr>
-        {% for bank in overview %}
-        <tr>
-            <td>{{bank.bank_name}}</td>
-            <td><a href="{{ url_for('account_details', account_id=bank.account_id) }}">{{bank.account_type}}</a></td>
-            <td>${{'{:.2f}'.format(bank.balance)}}</td>
-        </tr>
-        {% endfor %}
-    </table>
+
+        <div class="dashboard-invest">
+            <h2>Investment Portfolio</h2>
+            <form method="GET" action="{{ url_for('dashboard') }}">
+                <button type="submit" name="show_invest_chart" value="1">Load Investment Chart</button>
+            </form>
+
+            {% if show_invest_chart %}
+            <div>
+                <img src="{{ url_for('view_invest') }}" alt="Investment Distribution Chart">
+            </div>
+            {% endif %}
 
 
-    <form method="GET" action="{{ url_for('dashboard') }}">
-        <button type="submit" name="show_invest_chart" value="1">Load Investment Chart</button>
-    </form>
-
-    {% if show_invest_chart %}
-        <div>
-            <img src="{{ url_for('view_invest') }}" alt="Investment Distribution Chart">
+            <table>
+                <tr>
+                    <td>Bonds</td>
+                </tr>
+                <tr>
+                    <td>Investment Name</td>
+                    <td>Amount Invested</td>
+                    <td>Date Invested</td>
+                </tr>
+                {% for invest in investment %}
+                {% if invest.invest_type == "Bonds" %}
+                <tr>
+                    <td>{{invest.name}}</td>
+                    <td>{{'{:.2f}'.format(invest.amount)}}</td>
+                    <td>{{invest.date}}</td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+                <tr>
+                    <td>Total: ${{'{:.2f}'.format(invest_totals["Bonds"])}}</td>
+                </tr>
+            </table>
+            <table>
+                <tr>
+                    <td>ETFs</td>
+                </tr>
+                <tr>
+                    <td>Investment Name</td>
+                    <td>Amount Invested</td>
+                    <td>Date Invested</td>
+                </tr>
+                {% for invest in investment %}
+                {% if invest.invest_type == "ETF" %}
+                <tr>
+                    <td><a href="{{ url_for('invest_details', ticker=invest.ticker) }}">{{invest.name}}</a></td>
+                    <td>{{'{:.2f}'.format(invest.amount)}}</td>
+                    <td>{{invest.date}}</td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+                <tr>
+                    <td>Total: ${{'{:.2f}'.format(invest_totals["ETF"])}}</td>
+                </tr>
+            </table>
+            <table>
+                <tr>
+                    <td>Mutual Funds</td>
+                </tr>
+                <tr>
+                    <td>Investment Name</td>
+                    <td>Amount Invested</td>
+                    <td>Date Invested</td>
+                </tr>
+                {% for invest in investment %}
+                {% if invest.invest_type == "Mutual Fund" %}
+                <tr>
+                    <td>{{invest.name}}</td>
+                    <td>{{'{:.2f}'.format(invest.amount)}}</td>
+                    <td>{{invest.date}}</td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+                <tr>
+                    <td>Total: ${{'{:.2f}'.format(invest_totals["Mutual Fund"])}}</td>
+                </tr>
+            </table>
+            <table>
+                <tr>
+                    <td>Stocks</td>
+                </tr>
+                <tr>
+                    <td>Investment Name</td>
+                    <td>Amount Invested</td>
+                    <td>Date Invested</td>
+                </tr>
+                {% for invest in investment %}
+                {% if invest.invest_type == "Stock" %}
+                <tr>
+                    <td>{{invest.name}}</td>
+                    <td><a
+                            href="{{ url_for('invest_details', ticker=invest.ticker) }}">{{'{:.2f}'.format(invest.amount)}}</a>
+                    </td>
+                    <td>{{invest.date}}</td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+                <tr>
+                    <td>Total: ${{'{:.2f}'.format(invest_totals["Stock"])}}</td>
+                </tr>
+            </table>
         </div>
-    {% endif %}
-
-
-    <table>
-        <tr>
-            <td>Bonds</td>
-        </tr>
-        <tr>
-            <td>Investment Name</td>
-            <td>Amount Invested</td>
-            <td>Date Invested</td>
-        </tr>
-        {% for invest in investment %}
-        {% if invest.invest_type == "Bonds" %}
-        <tr>
-            <td>{{invest.name}}</td>
-            <td>{{'{:.2f}'.format(invest.amount)}}</td>
-            <td>{{invest.date}}</td>
-        </tr>
-        {% endif %}
-        {% endfor %}
-        <tr>
-            <td>Total: ${{'{:.2f}'.format(invest_totals["Bonds"])}}</td>
-        </tr>
-    </table>
-    <table>
-        <tr>
-            <td>ETFs</td>
-        </tr>
-        <tr>
-            <td>Investment Name</td>
-            <td>Amount Invested</td>
-            <td>Date Invested</td>
-        </tr>
-        {% for invest in investment %}
-        {% if invest.invest_type == "ETF" %}
-        <tr>
-            <td><a href="{{ url_for('invest_details', ticker=invest.ticker) }}">{{invest.name}}</a></td>
-            <td>{{'{:.2f}'.format(invest.amount)}}</td>
-            <td>{{invest.date}}</td>
-        </tr>
-        {% endif %}
-        {% endfor %}
-        <tr>
-            <td>Total: ${{'{:.2f}'.format(invest_totals["ETF"])}}</td>
-        </tr>
-    </table>
-    <table>
-        <tr>
-            <td>Mutual Funds</td>
-        </tr>
-        <tr>
-            <td>Investment Name</td>
-            <td>Amount Invested</td>
-            <td>Date Invested</td>
-        </tr>
-        {% for invest in investment %}
-        {% if invest.invest_type == "Mutual Fund" %}
-        <tr>
-            <td>{{invest.name}}</td>
-            <td>{{'{:.2f}'.format(invest.amount)}}</td>
-            <td>{{invest.date}}</td>
-        </tr>
-        {% endif %}
-        {% endfor %}
-        <tr>
-            <td>Total: ${{'{:.2f}'.format(invest_totals["Mutual Fund"])}}</td>
-        </tr>
-    </table>
-    <table>
-        <tr>
-            <td>Stocks</td>
-        </tr>
-        <tr>
-            <td>Investment Name</td>
-            <td>Amount Invested</td>
-            <td>Date Invested</td>
-        </tr>
-        {% for invest in investment %}
-        {% if invest.invest_type == "Stock" %}
-        <tr>
-            <td>{{invest.name}}</td>
-            <td><a href="{{ url_for('invest_details', ticker=invest.ticker) }}">{{'{:.2f}'.format(invest.amount)}}</a></td>
-            <td>{{invest.date}}</td>
-        </tr>
-        {% endif %}
-        {% endfor %}
-        <tr>
-            <td>Total: ${{'{:.2f}'.format(invest_totals["Stock"])}}</td>
-        </tr>
-    </table>
-
+    </main>
+    <footer>
+        <p>&copy; 2025 AI-Powered Banking. All rights reserved.</p>
+    </footer>
 </body>
 
 </html>

@@ -798,7 +798,7 @@ def view_overview():
     user = User.get(User.username == session["username"])
     overview = DataOverview.select().where(DataOverview.user == user)
 
-    fig, ax = plt.subplots(figsize=(10, 6))
+    fig, ax = plt.subplots(figsize=(15, 11))
     
     bank_accounts={}
     for account in overview:
