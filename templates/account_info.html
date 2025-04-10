@@ -4,28 +4,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+    <title>Account Details - AI-Powered Banking</title>
 </head>
 
 <body>
-    <h1>Account Transactions</h1>  
-    <table>
-        <tr>
-            <td>Account Overview</td>
-        </tr>
-        <tr>
-            <td>Description</td>
-            <td>Amount</td>
-            <td>Date</td>
-        </tr>
-        {% for transaction in account %}
-        <tr>
-            <td>{{transaction.description}}</td>
-            <td>{{transaction.amount}}</td>
-            <td>{{transaction.date}}</td>
-        </tr>
-        {% endfor %}
-    </table>
+    <header class="dashboard-header">
+        <h1>Account Transactions</h1>
+        <p>Learn how your current finances are being handled.</p>
+    </header>
+
+    <main class="dashboard-main">
+            <h2>{{name[0].bank_name}} {{name[0].account_type}} Details</h2>
+        <table>
+            <tr>
+                <td>Description</td>
+                <td>Amount</td>
+                <td>Date</td>
+            </tr>
+            {% for transaction in account %}
+            <tr>
+                <td>{{transaction.description}}</td>
+                <td>{{transaction.amount}}</td>
+                <td>{{transaction.date}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </main>
 
 </body>
 

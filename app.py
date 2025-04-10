@@ -881,7 +881,8 @@ def view_invest():
 def account_details(account_id):
     user = User.get(User.username == session["username"])
     account = DataTransaction.select().where((DataTransaction.user == user) & (DataTransaction.bank_account_id == account_id))
-    return render_template("account_info.html", account=account)
+    account_name = DataOverview.select().where((DataOverview.user == user) & (DataOverview.account_id == account_id))
+    return render_template("account_info.html", account=account, name=account_name)
 
 @app.route("/invest/<ticker>")
 @login_required
