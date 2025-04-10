@@ -59,7 +59,7 @@
 
             <table>
                 <tr>
-                    <td>Bonds</td>
+                    <td class="table-tab"><strong>Bonds</strong></td>
                 </tr>
                 <tr>
                     <td>Investment Name</td>
@@ -81,7 +81,7 @@
             </table>
             <table>
                 <tr>
-                    <td>ETFs</td>
+                    <td class="table-tab"><strong>ETFs</strong></td>
                 </tr>
                 <tr>
                     <td>Investment Name</td>
@@ -103,7 +103,7 @@
             </table>
             <table>
                 <tr>
-                    <td>Mutual Funds</td>
+                    <td class="table-tab"><strong>Mutual Funds</strong></td>
                 </tr>
                 <tr>
                     <td>Investment Name</td>
@@ -125,7 +125,7 @@
             </table>
             <table>
                 <tr>
-                    <td>Stocks</td>
+                    <td class="table-tab"><strong>Stocks</strong></td>
                 </tr>
                 <tr>
                     <td>Investment Name</td>
@@ -135,10 +135,8 @@
                 {% for invest in investment %}
                 {% if invest.invest_type == "Stock" %}
                 <tr>
-                    <td>{{invest.name}}</td>
-                    <td><a
-                            href="{{ url_for('invest_details', ticker=invest.ticker) }}">{{'{:.2f}'.format(invest.amount)}}</a>
-                    </td>
+                    <td><a href="{{ url_for('invest_details', ticker=invest.ticker) }}">{{invest.name}}</a></td>
+                    <td>{{'{:.2f}'.format(invest.amount)}}</td>
                     <td>{{invest.date}}</td>
                 </tr>
                 {% endif %}

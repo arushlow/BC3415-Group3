@@ -4,76 +4,146 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
     <title>Investment Details - AI-Powered Banking</title>
 </head>
 
 <body>
-    <h1>Account Transactions</h1> 
-    
-    <table>
-        <tr>
-            <td>Current Account Overview</td>
-        </tr>
-        <tr>
-            <td>Investment Growth %</td>
-            <td>Investment Change</td>
-            <td>Current Investment Worth</td>
-        </tr>
-        {% for invest in account %}
-        <tr>
-            <td><h1><strong>{{change[invest.date]['growth']}}%</strong></h1></td>
-            <td><h1><strong>${{change[invest.date]['increase']}}</strong></h1></td>
-            <td><h1><strong>${{change[invest.date]['current']}}</strong></h1></td>
-        </tr>
-        {% endfor %}
-    </table>
+    <header class="dashboard-header">
+        <h1>Account Transactions</h1>
+    </header>
 
-    <table>
-        <tr>
-            <td>Original Account Overview</td>
-        </tr>
-        <tr>
-            <td>Investment Type</td>
-            <td>Price Bought</td>
-            <td>Quantity</td>
-            <td>Total Invested</td>
-            <td>Date Purchased</td>
-        </tr>
-        {% for invest in account %}
-        <tr>
-            <td>{{invest.invest_type}}</td>
-            <td>{{invest.price}}</td>
-            <td>{{invest.quantity}}</td>
-            <td>{{invest.amount}}</td>
-            <td>{{invest.date}}</td>
-        </tr>
-        {% endfor %}
-    </table>
-    <table>
-        <h2>Overview of Investment</h2>
-        <h3>Name: {{stock['companyName']}}</h3>
-        <h3>Symbol: {{stock['symbol']}}</h3>
-        <p>Sector: {{stock['sector']}}</p>
-        <p>Industry: {{stock['industry']}}</p>
-        <p>Website: {{stock['website']}}</p>
-        <p>Country: {{stock['country']}}</p>
-        <p>Currency: {{stock['currency']}}</p>
-        <p>Description: {{stock['symbol']}}</p>
-
-        <h2>Investment Data</h2>
-        <h3>Price: {{stock['price']}}</h3>
-        <h3>Market Cap: {{stock['marketCap']}}</h3>
-        <h3>Volume: {{stock['volume']}}</h3>
-        <p>Last Dividend: {{stock['lastDividend']}}</p>
-        <p>Range: {{stock['range']}}</p>
-        <p>Change: {{stock['change']}}</p>
-        <p>Change %: {{stock['changePercentage']}}</p>
-
-
-        
-
-    </table>
-
+    <main class="dashboard-main">
+        <div class="dashboard-overview">
+            <h2>Current Account Overview</h2>
+            <table>
+                <tr>
+                    <td>Investment Growth %</td>
+                    <td>Investment Change</td>
+                    <td>Current Investment Worth</td>
+                </tr>
+                {% for invest in account %}
+                <tr>
+                    <td>
+                        <h1><strong>{{change[invest.date]['growth']}}%</strong></h1>
+                    </td>
+                    <td>
+                        <h1><strong>${{change[invest.date]['increase']}}</strong></h1>
+                    </td>
+                    <td>
+                        <h1><strong>${{change[invest.date]['current']}}</strong></h1>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+        <div class="dashboard-overview">
+            <h2>Original Account Overview</h2>
+            <table>
+                <tr>
+                    <td>Investment Type</td>
+                    <td>Price Bought</td>
+                    <td>Quantity</td>
+                    <td>Total Invested</td>
+                    <td>Date Purchased</td>
+                </tr>
+                {% for invest in account %}
+                <tr>
+                    <td>{{invest.invest_type}}</td>
+                    <td>{{invest.price}}</td>
+                    <td>{{invest.quantity}}</td>
+                    <td>{{invest.amount}}</td>
+                    <td>{{invest.date}}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+        <div class="dashboard-overview">
+            <h2>Overview of Investment</h2>
+            <table>
+                <tr>
+                    <td>
+                        <h3>Name: {{stock['companyName']}}</h3>
+                </tr>
+                </td>
+                <tr>
+                    <td>
+                        <h3>Symbol: {{stock['symbol']}}</h3>
+                </tr>
+                </td>
+                <tr>
+                    <td>
+                        <p>Sector: {{stock['sector']}}</p>
+                </tr>
+                </td>
+                <tr>
+                    <td>
+                        <p>Industry: {{stock['industry']}}</p>
+                </tr>
+                </td>
+                <tr>
+                    <td>
+                        <p>Website: {{stock['website']}}</p>
+                </tr>
+                </td>
+                <tr>
+                    <td>
+                        <p>Country: {{stock['country']}}</p>
+                </tr>
+                </td>
+                <tr>
+                    <td>
+                        <p>Currency: {{stock['currency']}}</p>
+                </tr>
+                </td>
+                <tr>
+                    <td>
+                        <p>Description: {{stock['symbol']}}</p>
+                </tr>
+                </td>
+            </table>
+        </div>
+        <div class="dashboard-overview">
+            <h2>Investment Data</h2>
+            <table>
+                <tr>
+                    <td>
+                        <h3>Price: {{stock['price']}}</h3>
+                </tr>
+                </td>
+                <tr>
+                    <td>
+                        <h3>Market Cap: {{stock['marketCap']}}</h3>
+                </tr>
+                </td>
+                <tr>
+                    <td>
+                        <h3>Volume: {{stock['volume']}}</h3>
+                </tr>
+                </td>
+                <tr>
+                    <td>
+                        <p>Last Dividend: {{stock['lastDividend']}}</p>
+                </tr>
+                </td>
+                <tr>
+                    <td>
+                        <p>Range: {{stock['range']}}</p>
+                </tr>
+                </td>
+                <tr>
+                    <td>
+                        <p>Change: {{stock['change']}}</p>
+                </tr>
+                </td>
+                <tr>
+                    <td>
+                        <p>Change %: {{stock['changePercentage']}}</p>
+                </tr>
+                </td>
+            </table>
+        </div>
+    </main>
 </body>
 
 </html>

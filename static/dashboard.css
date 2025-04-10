@@ -94,6 +94,11 @@ body {
     text-decoration: underline;
 }
 
+.table-tab {
+    background-color: #28a745; 
+    color: #fff;
+}
+
 table {
     width: 100%;
     border-collapse: collapse; 
