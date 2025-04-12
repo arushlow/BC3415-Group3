@@ -21,10 +21,9 @@ body {
 }
 
 .dashboard-main {
-    width: 100%;
     max-width: 1200px; /* Optional: Limit the max width */
     margin: 0 auto; /* Center content */
-    padding: 0 20px;
+    padding: 2rem 1rem;
 }
 
 .dashboard-main h2 {
@@ -61,7 +60,6 @@ body {
     margin: 30px;
     border-radius: 8px; 
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); 
-    width: 100%;
     max-width: 100%; 
     overflow: hidden;
 }
@@ -205,6 +203,10 @@ table tr.total-row td {
     text-decoration: none;
     transition: color 0.3s;
     font-size: 14px;
+}
+
+.back-link:hover {
+    color: #007BFF;
 }
 
 footer {

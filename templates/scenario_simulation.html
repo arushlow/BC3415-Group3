@@ -23,29 +23,29 @@
                 <!-- Age and Retirement Information -->
                 <div class="input-group">
                     <label for="current-age">Current Age</label>
-                    <input type="number" id="current-age" name="current-age" placeholder="e.g., 30" required>
+                    <input type="number" id="current-age" name="current-age" placeholder="e.g., 30" required min="18" max="100">
                 </div>
                 
                 <div class="input-group">
                     <label for="retirement-age">Desired Retirement Age</label>
-                    <input type="number" id="retirement-age" name="retirement-age" placeholder="e.g., 65" required>
+                    <input type="number" id="retirement-age" name="retirement-age" placeholder="e.g., 65" required min="18" max="100">
                 </div>
 
                 <!-- Income and Expenses -->
                 <div class="input-group">
                     <label for="monthly-income">Monthly Income (SGD)</label>
-                    <input type="number" id="monthly-income" name="monthly-income" placeholder="e.g., 5000" required>
+                    <input type="number" id="monthly-income" name="monthly-income" placeholder="e.g., 5000" required min="0">
                 </div>
 
                 <div class="input-group">
                     <label for="monthly-expenses">Monthly Expenses (SGD)</label>
-                    <input type="number" id="monthly-expenses" name="monthly-expenses" placeholder="e.g., 3000" required>
+                    <input type="number" id="monthly-expenses" name="monthly-expenses" placeholder="e.g., 3000" required min="0">
                 </div>
 
                 <!-- Savings and Investment Preferences -->
                 <div class="input-group">
                     <label for="monthly-savings">Monthly Savings (SGD)</label>
-                    <input type="number" id="monthly-savings" name="monthly-savings" placeholder="e.g., 1000" required>
+                    <input type="number" id="monthly-savings" name="monthly-savings" placeholder="e.g., 1000" required min="0">
                 </div>
 
                 <div class="input-group">
@@ -79,17 +79,17 @@
 
                 <div class="input-group">
                     <label for="career-switch-age">Age of Career Switch</label>
-                    <input type="number" id="career-switch-age" name="career-switch-age" placeholder="e.g. 35">
+                    <input type="number" id="career-switch-age" name="career-switch-age" placeholder="e.g. 35" min="18" max="100">
                 </div>
 
                 <div class="input-group">
                     <label for="purchase-amount">Purchase Amount for House (SGD)</label>
-                    <input type="number" id="purchase-amount" name="purchase-amount" placeholder="e.g. 500000">
+                    <input type="number" id="purchase-amount" name="purchase-amount" placeholder="e.g. 500000" min="0">
                 </div>
 
                 <div class="input-group">
                     <label for="purchase-age">Age of House Purchase</label>
-                    <input type="number" id="purchase-age" name="purchase-age" placeholder="e.g. 35">
+                    <input type="number" id="purchase-age" name="purchase-age" placeholder="e.g. 35" min="18" max="100">
                 </div>
 
                 <button type="submit" class="cta-button">Simulate Scenario</button>

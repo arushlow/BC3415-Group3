@@ -56,7 +56,7 @@ header {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     padding: 1.5rem 0;
     width: 100%;
-    position: static; /* 恢复正常文档流定位 */
+    position: static;
     z-index: 10;
 }
 
@@ -69,7 +69,7 @@ h1 {
 main {
     padding: 2rem 1rem;
     max-width: 1000px;
-    margin: 0 auto; /* 重置为标准居中外边距 */
+    margin: 0 auto;
     width: 100%;
     box-sizing: border-box;
 }

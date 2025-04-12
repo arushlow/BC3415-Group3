@@ -367,6 +367,8 @@ def run_simulation():
             retirement_investment_strategy
         )
         return jsonify(results)
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
     except Exception as e:
         logging.error(f"Simulation error: {e}", exc_info=True)
         return jsonify({"error": "Error in running scenario simulation"}), 500
@@ -929,7 +931,7 @@ def data_overview():
             required_fields = ["Account ID", "Bank Name", "Bank Name (Short)", "Account Type", "Balance"]
             if not csvreader.fieldnames or not all(field in csvreader.fieldnames for field in required_fields):
                 logging.error(f"Incorrect CSV format - Required columns: {required_fields}, Received columns: {csvreader.fieldnames}")
-                return jsonify({"error": "Missing required columns in CSV"}), 400
+                return jsonify({"success": False, "message": "Missing required columns in CSV"}), 400
             
             for line in csvreader:
                 balance = float(line['Balance'].replace(',', ''))
@@ -962,11 +964,11 @@ def data_overview():
                     
     except KeyError as ke:
         logging.error(f"Missing required column in CSV - {ke}", exc_info=True)
-        return jsonify({"error": f"Missing required column in CSV - {ke}"}), 400
+        return jsonify({"success": False, "message": f"Missing required column in CSV - {ke}"}), 400
     except Exception as e:
         logging.error(f"Error in data_overview: {e}", exc_info=True)
-        return jsonify({"error": "Error in processing Overview data"}), 500
-    return 'CSV data has been uploaded and processed'
+        return jsonify({"success": False, "message": "Error in processing Overview data"}), 500
+    return jsonify({"success": True, "message": 'CSV data has been uploaded and processed'})
 
 @app.route("/data_transaction", methods=['POST'])
 @login_required
@@ -1012,8 +1014,8 @@ def data_transaction():
 
     except Exception as e:
         logging.error(f"Error in data_transaction: {e}", exc_info=True)
-        return jsonify({"error": "Error in processing Transaction data"}), 500
-    return 'CSV data has been uploaded and processed'
+        return jsonify({"success": False, "message": "Error in processing Transaction data"}), 500
+    return jsonify({"success": True, "message": 'CSV data has been uploaded and processed'})
 
 @app.route("/data_invest", methods=['POST'])
 @login_required
@@ -1074,8 +1076,8 @@ def data_invest():
 
     except Exception as e:
         logging.error(f"Error in data_invest: {e}", exc_info=True)
-        return jsonify({"error": "Error in processing Investment data: " + str(e)}), 500
-    return 'CSV data has been uploaded and processed'
+        return jsonify({"success": False, "message": "Error in processing Investment data: " + str(e)}), 500
+    return jsonify({"success": True, "message": 'CSV data has been uploaded and processed'})
 
 @app.errorhandler(404)
 def page_not_found(e):

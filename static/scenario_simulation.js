@@ -31,13 +31,23 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             body: JSON.stringify(formData)
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(errData => {
+                    throw new Error(errData.error || 'Something went wrong. Please try again.');
+                });
+            }
+            return response.json();
+        })
         .then(data => {
             displayResults(data);
         })
         .catch(error => {
             console.error('Error:', error);
-            resultSummary.innerHTML = '<div class="error">Something went wrong, please try again.</div>';
+            resultSummary.innerHTML = `<div class="error">
+                <p>${error.message || 'Something went wrong. Please try again.'}</p>
+            </div>`;
+            resultChart.innerHTML = '';
         });
     });
     

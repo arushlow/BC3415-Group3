@@ -2,6 +2,41 @@ def simulate_retirement(current_age, retirement_age, monthly_income, monthly_exp
                         monthly_savings, investment_strategy, investment_increase=0,
                         career_switch_impact=0, purchase_amount=0, career_switch_age=0, purchase_age=0,
                         retirement_investment_strategy="conservative"):
+    # Input validations
+    if not (18 <= current_age <= 100):
+        raise ValueError("Current Age must be between 18 and 100")
+    
+    if not (18 <= retirement_age <= 100):
+        raise ValueError("Retirement Age must be between 18 and 100")
+    
+    if retirement_age <= current_age:
+        raise ValueError("Retirement Age must be greater than Current Age")
+    
+    valid_strategies = ["conservative", "balanced", "aggressive"]
+    if investment_strategy not in valid_strategies:
+        raise ValueError("Investment Strategy must be Conservative, Balanced or Aggressive")
+    
+    if retirement_investment_strategy not in valid_strategies:
+        raise ValueError("Investment Strategy After Retirement must be Conservative, Balanced or Aggressive")
+    
+    if monthly_income < 0:
+        raise ValueError("Monthly Income cannot be negative")
+    
+    if monthly_expenses < 0:
+        raise ValueError("Monthly Expenses cannot be negative")
+    
+    if monthly_savings < 0:
+        raise ValueError("Monthly Savings cannot be negative")
+    
+    if purchase_amount < 0:
+        raise ValueError("Purchase Amount for House cannot be negative")
+    
+    if career_switch_age != 0 and not (18 <= career_switch_age <= 100):
+        raise ValueError("Age of Career Switch must be between 18 and 100")
+    
+    if purchase_age != 0 and not (18 <= purchase_age <= 100):
+        raise ValueError("Age of House Purchase must be between 18 and 100")
+
     annual_return_rates = {
         "conservative": 0.04,  # 4%
         "balanced": 0.06,      # 6%
@@ -91,8 +126,9 @@ def generate_summary(working_results, retirement_results, retirement_age):
     
     total_investment_returns = sum(year["investment_return"] for year in working_results)
     
-    roi_percentage = (total_investment_returns / retirement_savings * 100)
-    messages.append(f"Your investment return is approximately {roi_percentage:.1f}% of your total retirement savings.")
+    if retirement_savings > 0:
+        roi_percentage = (total_investment_returns / retirement_savings * 100)
+        messages.append(f"Your investment return is approximately {roi_percentage:.1f}% of your total retirement savings.")
     
     for i in range(1, len(working_results)):
         if working_results[i]["savings"] < working_results[i-1]["savings"]:
