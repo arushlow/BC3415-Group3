@@ -30,11 +30,6 @@ class User(BaseModel):
     password = CharField()
 
 
-class Investment(BaseModel):
-    user = ForeignKeyField(User, backref="investments")
-    # TODO: Other investment fields
-
-
 class ChatHistory(BaseModel):
     user = ForeignKeyField(User, backref="chats")
     chat_id = UUIDField()
@@ -78,4 +73,4 @@ class DataInvestment(BaseModel):
 
 def create_tables():
     with database:
-        database.create_tables([User, Investment, ChatHistory, DataOverview, DataTransaction, DataInvestment])
+        database.create_tables([User, ChatHistory, DataOverview, DataTransaction, DataInvestment])

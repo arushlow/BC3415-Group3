@@ -469,12 +469,12 @@ def send_message():
         chat_id = uuid.uuid4()
         is_new_chat_id = True
 
-    username = session["username"]
+    user = User.get(User.username == session["username"])
     message = request.form["message"]
     history = (
         ChatHistory.select()
         .where(
-            (ChatHistory.user == username) & (ChatHistory.chat_id == chat_id)
+            (ChatHistory.user == user) & (ChatHistory.chat_id == chat_id)
         )
         .order_by(ChatHistory.message_id)
     )
@@ -562,7 +562,7 @@ def send_message():
 
         if assistant_response:
             ChatHistory.create(
-                user=username,
+                user=user,
                 chat_id=chat_id,
                 chat_title=chat_title,
                 message=json.dumps({"role": "user", "content": message}),
@@ -570,7 +570,7 @@ def send_message():
             )
 
             ChatHistory.create(
-                user=username,
+                user=user,
                 chat_id=chat_id,
                 chat_title=chat_title,
                 message=json.dumps({"role": "assistant", "content": assistant_response}),
@@ -683,7 +683,7 @@ def send_message():
                 }
 
             ChatHistory.create(
-                user=username,
+                user=user,
                 chat_id=chat_id,
                 chat_title=chat_title,
                 message=json.dumps(tool_call_message),
@@ -691,7 +691,7 @@ def send_message():
             )
 
             ChatHistory.create(
-                user=username,
+                user=user,
                 chat_id=chat_id,
                 chat_title=chat_title,
                 message=json.dumps(tool_result_message),
@@ -712,11 +712,13 @@ def new_chat():
 @app.route("/ai_chatbot")
 @login_required
 def ai_chatbot():
+    user = User.get(User.username == session["username"])
+
     chats = (
         ChatHistory.select(
             ChatHistory.chat_id, ChatHistory.chat_title, ChatHistory.created_at
         )
-        .where(ChatHistory.user == session["username"])
+        .where(ChatHistory.user == user)
         .group_by(ChatHistory.chat_id)
         .order_by(ChatHistory.created_at.desc())
     )
@@ -731,7 +733,7 @@ def ai_chatbot():
         messages = (
             ChatHistory.select()
             .where(
-                (ChatHistory.user == session["username"])
+                (ChatHistory.user == user)
                 & (ChatHistory.chat_id == chat_id)
             )
             .order_by(ChatHistory.message_id)
@@ -750,10 +752,10 @@ def ai_chatbot():
 @login_required
 def clear_chat_history():
     try:
-        username = session["username"]
+        user = User.get(User.username == session["username"])
         with database.atomic():
             deleted_count = ChatHistory.delete().where(
-                ChatHistory.user == username
+                ChatHistory.user == user
             ).execute()
         
         return jsonify({"success": True, "message": f"Deleted {deleted_count} messages"}), 200
@@ -994,12 +996,12 @@ def data_transaction():
                     )
                     logging.debug(bank_account)
                     DataTransaction.create(
-                    user=user,
-                    bank_account_id=bank_account,
-                    date=datetime.strptime(line['Date'], '%Y-%m-%d').date(),
-                    description=line['Description'],
-                    amount=float(line['Amount'].replace(',', '')),
-                )
+                        user=user,
+                        bank_account_id=bank_account,
+                        date=datetime.strptime(line['Date'], '%Y-%m-%d').date(),
+                        description=line['Description'],
+                        amount=float(line['Amount'].replace(',', '')),
+                    )
                 except DataOverview.DoesNotExist:
                     logging.error(f"Account ID {line['Bank Account ID']} does not exist in DataOverview. Skipping transaction.")
                     continue 
