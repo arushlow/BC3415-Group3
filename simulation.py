@@ -1,7 +1,7 @@
 def simulate_retirement(current_age, retirement_age, monthly_income, monthly_expenses, 
                         monthly_savings, investment_strategy, investment_increase=0,
                         career_switch_impact=0, purchase_amount=0, career_switch_age=0, purchase_age=0,
-                        retirement_investment_strategy="conservative"):
+                        retirement_investment_strategy="null"):
     # Input validations
     if not (18 <= current_age <= 100):
         raise ValueError("Current Age must be between 18 and 100")
@@ -12,7 +12,7 @@ def simulate_retirement(current_age, retirement_age, monthly_income, monthly_exp
     if retirement_age <= current_age:
         raise ValueError("Retirement Age must be greater than Current Age")
     
-    valid_strategies = ["conservative", "balanced", "aggressive"]
+    valid_strategies = ["null", "conservative", "balanced", "aggressive"]
     if investment_strategy not in valid_strategies:
         raise ValueError("Investment Strategy must be Conservative, Balanced or Aggressive")
     
@@ -37,7 +37,14 @@ def simulate_retirement(current_age, retirement_age, monthly_income, monthly_exp
     if purchase_age != 0 and not (18 <= purchase_age <= 100):
         raise ValueError("Age of House Purchase must be between 18 and 100")
 
+    if (career_switch_age == 0 and career_switch_impact != 0) or (career_switch_age != 0 and career_switch_impact == 0):
+        raise ValueError("Age of Career Switch and Impact of Career Switch must both be specified or both be zero")
+    
+    if (purchase_age == 0 and purchase_amount != 0) or (purchase_age != 0 and purchase_amount == 0):
+        raise ValueError("Age of House Purchase and Purchase Amount for House must both be specified or both be zero")
+
     annual_return_rates = {
+        "null": 0.0,           # No investment
         "conservative": 0.04,  # 4%
         "balanced": 0.06,      # 6%
         "aggressive": 0.08     # 8%
@@ -59,17 +66,20 @@ def simulate_retirement(current_age, retirement_age, monthly_income, monthly_exp
         
         if career_switch_impact != 0 and career_switch_age != 0 and current_user_age == career_switch_age:
             annual_income += career_switch_impact
-            annual_savings = (annual_income / 12 - monthly_expenses) * 12
+
+        annual_savings = (annual_income / 12 - monthly_expenses) * 12
+        total_savings += annual_savings
             
         if investment_increase > 0:
             current_return = annual_return * (1 + (investment_increase / 100) * (year / working_years))
         else:
             current_return = annual_return
         
-        total_savings += annual_savings
-        
-        investment_return = total_savings * current_return
-        total_savings += investment_return
+        if total_savings > 0:
+            investment_return = total_savings * current_return
+            total_savings += investment_return
+        else:
+            investment_return = 0
         
         if purchase_amount > 0 and purchase_age != 0 and current_user_age == purchase_age:
             total_savings -= purchase_amount

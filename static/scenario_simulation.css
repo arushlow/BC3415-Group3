@@ -89,7 +89,6 @@ form {
     gap: 1rem;
 }
 
-
 #simulation-results {
     background-color: white;
     border-radius: 8px;
@@ -185,6 +184,15 @@ input:focus, select:focus {
 }
 
 .result-messages p {
+    margin: 0.5rem 0;
+}
+
+.warning-message {
+    color: #ff6b00;
+    font-weight: bold;
+    background-color: #fff8e6;
+    padding: 0.5rem;
+    border-left: 4px solid #ff6b00;
     margin: 0.5rem 0;
 }
 

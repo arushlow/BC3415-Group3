@@ -71,7 +71,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
             </div>
             <div class="result-messages">
-                ${data.summary.map(msg => `<p>➢ ${msg}</p>`).join('')}
+                ${data.summary.map(msg => {
+                    if (msg.startsWith("Warning: ")) {
+                        return `<p class="warning-message">➢ ${msg}</p>`;
+                    }
+                    return `<p>➢ ${msg}</p>`;
+                }).join('')}
             </div>
         `;
         
