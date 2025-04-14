@@ -389,7 +389,6 @@ def ai_generated_adjustments():
             logging.debug(f"Received data: {data}")
 
             if not data:
-                logging.error("No data received")
                 return jsonify({"error": "No data received"}), 400
 
             # Extract values safely
@@ -400,8 +399,10 @@ def ai_generated_adjustments():
                 investments = float(data.get("investments", 0))
                 debt = float(data.get("debt", 0))
             except ValueError as ve:
-                logging.error(f"Invalid numeric values: {ve}")
                 return jsonify({"error": "Invalid numeric values provided"}), 400
+            
+            if income <= 0 or expenses < 0 or savings < 0 or investments < 0 or debt < 0:
+                return jsonify({"error": "Negative values are not allowed"}), 400
 
             # Risk Tolerance Mapping
             risk_tolerance = data.get("risk_tolerance", "medium")
