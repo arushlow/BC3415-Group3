@@ -86,8 +86,8 @@ create_tables()
 ### Chatbot Configuration
 load_dotenv()
 client = OpenAI(
-    base_url="https://openrouter.ai/api/v1",
-    api_key=os.getenv("OPENROUTER_API_KEY")
+    base_url="https://generativelanguage.googleapis.com/v1beta/",
+    api_key=os.getenv("GEMINI_API_KEY")
 )
 
 
@@ -501,7 +501,7 @@ def send_message():
 
         stream = client.chat.completions.create(
             extra_body={},
-            model="google/gemini-2.5-pro-exp-03-25:free",
+            model="gemini-2.5-pro-exp-03-25",
             messages=history,
             tools=available_tools,
             stream=True,
